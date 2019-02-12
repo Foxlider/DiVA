@@ -6,8 +6,29 @@
 # User-specific files
 *.suo
 *.user
+*.csproj.user
 *.userosscache
 *.sln.docstates
+
+/Songs/*
+
+/.vs/
+/.vs/*
+/.svn/
+/.svn/*
+/Components/
+/Components/*
+# /packages/
+# /packages/*
+/packages_old/
+/packages_old/*
+/bin/
+/bin/*
+/obj/
+/obj/*
+/Versions/
+/Versions/*
+~$mdp_keystores.xlsx
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
