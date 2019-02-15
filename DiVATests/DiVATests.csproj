@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
     
-    <IsTestProject>true</IsTestProject>
+    <!--<IsTestProject>true</IsTestProject>-->
     <IsPackable>false</IsPackable>
 
     <Configurations>Debug;Release;DebugVerbose</Configurations>
