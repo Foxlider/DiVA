@@ -16,7 +16,7 @@ namespace DiVA.Services
         /// </summary>
         /// <param name="client"></param>
         /// <param name="path"></param>
-        /// <param name="speedModifier"></param>
+        /// <param name="stream"></param>
         /// <returns></returns>
         public async Task SendAsync(IAudioClient client, string path, AudioOutStream stream)
         {
@@ -52,7 +52,6 @@ namespace DiVA.Services
         /// Stream creator
         /// </summary>
         /// <param name="path"></param>
-        /// <param name="speedModifier"></param>
         /// <returns></returns>
         private static Process CreateStream(string path)
         {

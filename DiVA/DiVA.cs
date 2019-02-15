@@ -225,7 +225,7 @@ namespace DiVA
         /// <returns></returns>
         private async Task UserLeftGuildHandler(SocketGuildUser param)
         {
-            Random _rnd = new Random();
+            //Random _rnd = new Random();
             var channel = client.GetChannel(param.Guild.DefaultChannel.Id) as SocketTextChannel;
             await channel.SendMessageAsync($"{param.Mention} left us... Say bye ! ");
         }

@@ -86,7 +86,6 @@ namespace DiVA.Services
         /// <summary>
         /// Add a song to the queue
         /// </summary>
-        /// <param name="guild"></param>
         /// <param name="video"></param>
         /// <param name="voiceChannel"></param>
         /// <param name="messageChannel"></param>

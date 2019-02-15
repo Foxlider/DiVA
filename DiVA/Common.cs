@@ -26,7 +26,7 @@ namespace DiVA.Modules
         private readonly CommandService _service;
         private readonly IConfigurationRoot _config;
         private readonly DiscordSocketClient _client;
-        Random __rnd = new Random();
+        readonly Random __rnd = new Random();
 
         /// <summary>
         /// Common Commands module builder
@@ -40,7 +40,7 @@ namespace DiVA.Modules
         }
 
         #region COMMANDS
-        
+
         #region echo
         /// <summary>
         /// SAY - Echos a message
@@ -67,7 +67,6 @@ namespace DiVA.Modules
         [Alias("hi")]
         public async Task Hello()
         {
-            var choice = __rnd.Next(10);
             await CommandHelper.SayHelloAsync(Context.Channel, Context.Client, Context.User, __rnd);
             await Context.Message.DeleteAsync();
         }
@@ -86,14 +85,14 @@ namespace DiVA.Modules
             await Context.Message.DeleteAsync();
             var userInfo = user ?? Context.Client.CurrentUser;
             var builder = new EmbedBuilder();
-            EmbedFieldBuilder field = new EmbedFieldBuilder
+            _ = new EmbedFieldBuilder
             {
                 IsInline = false
             };
 
             builder.WithTitle($"User Informations");
             builder.WithDescription($"Informations of {userInfo.Mention} - {userInfo.Username}#{userInfo.Discriminator}");
-
+            EmbedFieldBuilder field;
             if (userInfo.IsBot)
             {
                 field = new EmbedFieldBuilder
@@ -309,7 +308,7 @@ namespace DiVA.Modules
             string answer = "";
             string chosenOne = choices[_rnd.Next(choices.Length)];
             if (choices[0].StartsWith("<@") && choices[0].EndsWith(">"))
-            { 
+            {
                 answer = chosenOne;
             }
             else
@@ -326,7 +325,7 @@ namespace DiVA.Modules
             //await ReplyAsync(choices[_rnd.Next(choices.Length)]);
             await ReplyAsync(answer);
             await Context.Message.DeleteAsync();
-        } 
+        }
 
         #endregion choose
 
@@ -340,7 +339,7 @@ namespace DiVA.Modules
         [Alias("r")]
         public async Task Roll(string dice)
         {
-            
+
             try
             {
                 var result = dice
@@ -431,7 +430,7 @@ namespace DiVA.Modules
         public async Task Status(string stat = "")
         {
             await Context.Message.DeleteAsync();
-            if ( stat == null ||stat == "")
+            if (stat == null || stat == "")
                 await _client.SetGameAsync($"Ready to meet {Assembly.GetExecutingAssembly().GetName().Name} v{DiVA.GetVersion()} ?");
             else
                 await _client.SetGameAsync(stat);
@@ -439,15 +438,15 @@ namespace DiVA.Modules
 
         #endregion status
 
+
         #region cmdtest
         /// <summary>
         /// Tests the console
         /// </summary>
-        /// <param name="stat"></param>
         /// <returns></returns>
         [Command("consoletest")]
         [Summary("TestConsole")]
-        public async Task ConsoleTest(string stat = "")
+        public async Task ConsoleTest()
         {
             await Context.Message.DeleteAsync();
             Log.Neutral("Neutral", "Commands ConsoleTest");
@@ -532,7 +531,7 @@ namespace DiVA.Modules
             { Log.Warning($"Error while processing song requet: {e}", "Audio Request"); }
         }
         #endregion
-        
+
         #region test
         /// <summary>
         /// TEST - Sound test (watch your ears)
@@ -685,10 +684,10 @@ namespace DiVA.Modules
             { await ReplyAsync($"{Context.User.Mention} now playing `{songlist.FirstOrDefault().Title}` requested by {songlist.FirstOrDefault().Requester}"); }
         }
         #endregion
-        
+
         #endregion
     }
-    
+
     /// <summary>
     /// Cache handler group
     /// </summary>
@@ -716,8 +715,10 @@ namespace DiVA.Modules
                     builder.WithDescription($"List of songs downloaded\n");
                     foreach (var line in File.ReadAllLines(Path.Combine(cachePath, "songlist.cache")))
                     {
+                        //The line is in CSV format : "{SongName}, {Filename.mp3};\n"
                         var filename = line.Split(",").Last().Trim(';');
-                        var title = line.Substring(0, line.Length-(filename.Length + 2));
+                        var title = line.Substring(0, line.Length - (filename.Length + 2));
+                        //Addign field to the Embed builder
                         var field = new EmbedFieldBuilder
                         {
                             IsInline = false,
@@ -748,7 +749,8 @@ namespace DiVA.Modules
         /// </summary>
         /// <returns></returns>
         [Command("delete"), Summary("Delete cache files")]
-        public async Task Delete(string input=null)
+        [RequireUserPermission(GuildPermission.Administrator)]
+        public async Task Delete(string input = null)
         {
             string cachePath = Path.Combine(AppContext.BaseDirectory, "Songs");
             DirectoryInfo d = new DirectoryInfo(cachePath);
