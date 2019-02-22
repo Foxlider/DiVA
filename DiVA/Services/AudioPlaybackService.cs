@@ -18,7 +18,7 @@ namespace DiVA.Services
         /// <param name="path"></param>
         /// <param name="stream"></param>
         /// <returns></returns>
-        public async Task SendAsync(IAudioClient client, string path, AudioOutStream stream)
+        public async Task SendAsync(string path, AudioOutStream stream)
         {
             _currentProcess = CreateStream(path);
             

@@ -51,7 +51,7 @@ namespace DiVA.Services
             finally
             { }
             await voice.Channel.DisconnectAsync();
-            ConnectedChannels.TryRemove(voice.Channel.Guild.Id, out VoiceConnexion tempVoice);
+            ConnectedChannels.TryRemove(voice.Channel.Guild.Id, out _);
         }
 
         /// <summary>
@@ -92,7 +92,7 @@ namespace DiVA.Services
         public async void Queue(IPlayable video, IVoiceChannel voiceChannel, IMessageChannel messageChannel)
         {
             bool firstConnexion = false;
-            if (!ConnectedChannels.TryGetValue(voiceChannel.Guild.Id, out VoiceConnexion tempsVoice))
+            if (!ConnectedChannels.TryGetValue(voiceChannel.Guild.Id, out _))
             {
                 Log.Information("Connecting to voice channel", "Audio Queue");
                 VoiceConnexion connexion = new VoiceConnexion
@@ -144,7 +144,7 @@ namespace DiVA.Services
                         await messageChannel?.SendMessageAsync($"Now playing **{NowPlaying.Title}** | `{NowPlaying.DurationString}` | requested by {NowPlaying.Requester}");
                         await voice.Client.SetSpeakingAsync(true);
                         try
-                        { await AudioPlaybackService.SendAsync(voice.Client, NowPlaying.FullPath, stream); }
+                        { await AudioPlaybackService.SendAsync(NowPlaying.FullPath, stream); }
                         catch (OperationCanceledException)
                         { Log.Verbose("Song have been skipped.", "Audio ProcessQueue"); }
                         catch (InvalidOperationException)
@@ -159,7 +159,7 @@ namespace DiVA.Services
                 }
             }
             await voice.Channel.DisconnectAsync();
-            ConnectedChannels.TryRemove(voiceChannel.Guild.Id, out VoiceConnexion tempVoice);
+            ConnectedChannels.TryRemove(voiceChannel.Guild.Id, out _);
         }
     }
 

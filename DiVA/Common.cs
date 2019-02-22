@@ -52,11 +52,39 @@ namespace DiVA.Modules
         [RequireUserPermission(GuildPermission.Administrator)]
         public async Task Say([Remainder, Summary("The text to echo")] string echo)
         {
-            await Context.Message.DeleteAsync();
+            try
+            { await Context.Message.DeleteAsync(); }
+            finally {}
             await ReplyAsync(echo);
         }
 
         #endregion echo
+
+        #region say to
+
+        [Command("sayto"), Summary("Echos a message to a server.")]
+        [Alias("echoto")]
+        [RequireContext(ContextType.DM)]
+        public async Task SayTo(ulong discordId, [Remainder, Summary("The text to echo")] string echo)
+        {
+            try
+            { await Context.Message.DeleteAsync(); }
+            catch {}
+            try
+            {
+                if (await Context.Client.GetChannelAsync(discordId) is IMessageChannel channel)
+                { await channel.SendMessageAsync(echo); }
+                else
+                {
+                    var user = await Context.Client.GetUserAsync(discordId);
+                    await user.SendMessageAsync(echo);
+                }
+            }
+            catch
+            { await ReplyAsync("Could not find this channel"); }
+        }
+
+        #endregion say to
 
         #region hello
         /// <summary>
@@ -68,7 +96,9 @@ namespace DiVA.Modules
         public async Task Hello()
         {
             await CommandHelper.SayHelloAsync(Context.Channel, Context.Client, Context.User, __rnd);
-            await Context.Message.DeleteAsync();
+            try
+            { await Context.Message.DeleteAsync(); }
+            catch {}
         }
         #endregion hello
 
@@ -82,7 +112,9 @@ namespace DiVA.Modules
         [Alias("user", "whois")]
         public async Task UserInfo([Summary("The (optional) user to get info for")] IUser user = null)
         {
-            await Context.Message.DeleteAsync();
+            try
+            { await Context.Message.DeleteAsync(); }
+            catch {}
             var userInfo = user ?? Context.Client.CurrentUser;
             var builder = new EmbedBuilder();
             _ = new EmbedFieldBuilder
@@ -173,7 +205,9 @@ namespace DiVA.Modules
         {
             if (command == null)    //______________________________________________        HELP WITH NO COMMAND PROVIDED
             {
-                await Context.Message.DeleteAsync();
+                try
+                { await Context.Message.DeleteAsync(); }
+                catch {}
                 string prefix = _config["prefix"];
                 var builder = new EmbedBuilder()
                 {
@@ -250,7 +284,9 @@ namespace DiVA.Modules
         [Alias("v")]
         public async Task Version()
         {
-            await Context.Message.DeleteAsync();
+            try
+            { await Context.Message.DeleteAsync(); }
+            catch {}
             var arch = System.Runtime.InteropServices.RuntimeInformation.OSArchitecture;
             var OSdesc = System.Runtime.InteropServices.RuntimeInformation.OSDescription;
 
@@ -324,7 +360,9 @@ namespace DiVA.Modules
             //if(choices[0].StartsWith("<@") && choices[0])
             //await ReplyAsync(choices[_rnd.Next(choices.Length)]);
             await ReplyAsync(answer);
-            await Context.Message.DeleteAsync();
+            try
+            { await Context.Message.DeleteAsync(); }
+            catch {}
         }
 
         #endregion choose
@@ -370,7 +408,11 @@ namespace DiVA.Modules
             catch
             { await ReplyAsync("C'est con mais j'ai pas compris..."); }
             finally
-            { await Context.Message.DeleteAsync(); }
+            {
+                try
+                { await Context.Message.DeleteAsync(); }
+                catch {}
+            }
         }
         #endregion roll
 
@@ -380,7 +422,7 @@ namespace DiVA.Modules
         /// </summary>
         /// <param name="dice">string of the dices (ex. 1d10)</param>
         /// <returns></returns>
-        [Command("pvroll"), Summary("Secretly olls a dice")]
+        [Command("pvroll"), Summary("Secretly rolls a dice")]
         [Alias("pvr")]
         public async Task PrivateRoll(string dice)
         {
@@ -414,7 +456,11 @@ namespace DiVA.Modules
             catch
             { await Context.User.SendMessageAsync("C'est con mais j'ai pas compris..."); }
             finally
-            { await Context.Message.DeleteAsync(); }
+            {
+                try
+                { await Context.Message.DeleteAsync(); }
+                catch {}
+            }
         }
 
         #endregion roll
@@ -429,7 +475,9 @@ namespace DiVA.Modules
         [Summary("Change the status of the bot")]
         public async Task Status(string stat = "")
         {
-            await Context.Message.DeleteAsync();
+            try
+            { await Context.Message.DeleteAsync(); }
+            catch {}
             if (stat == null || stat == "")
                 await _client.SetGameAsync($"Ready to meet {Assembly.GetExecutingAssembly().GetName().Name} v{DiVA.GetVersion()} ?");
             else
@@ -448,7 +496,9 @@ namespace DiVA.Modules
         [Summary("TestConsole")]
         public async Task ConsoleTest()
         {
-            await Context.Message.DeleteAsync();
+            try
+            { await Context.Message.DeleteAsync(); }
+            catch {}
             Log.Neutral("Neutral", "Commands ConsoleTest");
             Log.Information("Information", "Commands ConsoleTest");
             Log.Verbose("Verbose", "Commands ConsoleTest");
@@ -460,6 +510,64 @@ namespace DiVA.Modules
         #endregion cmdtest
 
         #endregion COMMANDS
+    }
+
+    [Name("Interactive")]
+    [Summary("Interactive commands for DiVA")]
+    public class Interactive : ModuleBase
+    {
+        [Command("ping")]
+        [Summary("Ping command for @Darlon")]
+        [Alias("pong")] // alternative names for the command
+        public async Task Ping() // this command takes no arguments
+        {
+            await Context.Channel.TriggerTypingAsync();
+            //Hi @Darlon !
+            await ReplyAsync($"Pong!");
+        }
+
+        [Command("poll", RunMode = RunMode.Async), Summary("Run a poll with reactions.")]
+        public async Task Poll([Summary("Duration (10s)")] TimeSpan duration, [Summary("Options (:ok_hand: :thumbsup:)")] params string[] options)
+        {
+            var poll_options = options.Select(xe => xe.ToString());
+            var embed = new EmbedBuilder
+            {
+                Title = "Poll time!",
+                Description = string.Join(" ", poll_options)
+            };
+            var msg = await ReplyAsync(embed: embed.Build());
+            List<Emote> emoteList = new List<Emote>();
+            List<Emoji> emojiList = new List<Emoji>();
+
+            foreach (var opt in options)
+            {
+                if (Emote.TryParse(opt, out var emote))
+                {
+                    emoteList.Add(emote);
+                    await msg.AddReactionAsync(emote);
+                }
+                else
+                {
+                    var emoji = new Emoji(opt);
+                    emojiList.Add(emoji);
+                    await msg.AddReactionAsync(emoji);
+                }
+            }
+            await Task.Delay(duration);
+
+            var finalMessage = await Context.Channel.GetMessageAsync(msg.Id) as IUserMessage;
+
+            var resEmote = finalMessage.Reactions.Where(xkvp => emoteList.Contains(xkvp.Key))
+                .Select(xkvp => $"{xkvp.Key}: {xkvp.Value.ReactionCount}");
+
+            var resEmoji = finalMessage.Reactions.Where(xkvp => emojiList.Contains(xkvp.Key))
+                .Select(xkvp => $"{xkvp.Key}: {xkvp.Value.ReactionCount}");
+
+            var results = resEmoji.Union(resEmote).ToList();
+
+            // and finally post the results
+            await ReplyAsync($"Results : \n{string.Join("\n", results)}");
+        }
     }
 
     /// <summary>
@@ -495,18 +603,18 @@ namespace DiVA.Modules
         {
             try
             {
-                //if (!Uri.IsWellFormedUriString(url, UriKind.Absolute))
-                //{
-                //    await ReplyAsync($"{Context.User.Mention} please provide a valid song URL");
-                //    return;
-                //}
+                await Context.Channel.TriggerTypingAsync();
                 DownloadedVideo video = await YouTubeDownloadService.GetVideoData(url);
-                await Context.Message.DeleteAsync();
+                try
+                { await Context.Message.DeleteAsync(); }
+                catch {}
                 if (!File.Exists(Path.Combine("Songs", $"{video.DisplayID}.mp3")))
                 {
                     var downloadAnnouncement = await ReplyAsync($"{Context.User.Mention} attempting to download {url}");
                     video = await YoutubeDownloadService.DownloadVideo(video);
-                    await downloadAnnouncement.DeleteAsync();
+                    try
+                    { await downloadAnnouncement.DeleteAsync(); }
+                    catch {}
                 }
 
                 if (video == null)
@@ -564,7 +672,9 @@ namespace DiVA.Modules
 
                 var downloadAnnouncement = await ReplyAsync($"{Context.User.Mention} attempting to open {url}");
                 var stream = await YouTubeDownloadService.GetLivestreamData(url);
-                await downloadAnnouncement.DeleteAsync();
+                try
+                { await downloadAnnouncement.DeleteAsync(); }
+                catch {}
 
                 if (stream == null)
                 {
@@ -634,7 +744,9 @@ namespace DiVA.Modules
         {
             SongService.Next(Context.Guild.Id);
             await ReplyAsync("Skipped song");
-            await Context.Message.DeleteAsync();
+            try
+            { await Context.Message.DeleteAsync(); }
+            catch {}
         }
         #endregion
 
@@ -739,7 +851,11 @@ namespace DiVA.Modules
                 { await Context.Channel.SendMessageAsync("No music have been downloaded yet"); }
             }
             finally
-            { await Context.Message.DeleteAsync(); }
+            {
+                try
+                { await Context.Message.DeleteAsync(); }
+                catch {}
+            }
         }
         #endregion
 
@@ -778,7 +894,9 @@ namespace DiVA.Modules
                     { await Context.User.SendMessageAsync($"No file have been found under the name {input}"); }
                 }
             }
-            await Context.Message.DeleteAsync();
+            try
+            { await Context.Message.DeleteAsync(); }
+            catch {}
         }
         #endregion
 

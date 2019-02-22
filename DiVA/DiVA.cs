@@ -180,6 +180,7 @@ namespace DiVA
         /// <param name="serviceCollection"></param>
         private void ConfigureServices(IServiceCollection serviceCollection)
         {
+            
             serviceCollection.AddSingleton(new YouTubeDownloadService());
             serviceCollection.AddSingleton(new AudioPlaybackService());
             serviceCollection.AddSingleton(new AudioService());
@@ -194,6 +195,8 @@ namespace DiVA
         {
             // Don't process the command if it was a System Message
             if (!(messageParam is SocketUserMessage message)) return;
+            if (message.Channel is IPrivateChannel)
+            { Log.Neutral($"{message.Author} in {message.Channel.Name}\n    :: { message.Content}", "DirectMessage"); }
             // Create a number to track where the prefix ends and the command begins
             int argPos = 0;
             if (!(message.HasStringPrefix(Configuration["prefix"], ref argPos) || message.HasMentionPrefix(client.CurrentUser, ref argPos))) return;
