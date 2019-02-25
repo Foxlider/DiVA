@@ -4,15 +4,15 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <StartupObject>DiVA.DiVA</StartupObject>
-    <ApplicationIcon>Papirus-Team-Papirus-Apps-Discord.ico</ApplicationIcon>
+    <ApplicationIcon />
     <Win32Resource />
-    <Version>1.3</Version>
+    <Version>1.4</Version>
     <Authors>Foxlider</Authors>
     <Company>FoxliCorp</Company>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <AssemblyName>DiVA</AssemblyName>
-    <AssemblyVersion>1.3.0.0</AssemblyVersion>
-    <FileVersion>1.2.0.0</FileVersion>
+    <AssemblyVersion>1.4.0.0</AssemblyVersion>
+    <FileVersion>1.4.0.0</FileVersion>
     <Description>DiVA is the bot written in C# to replace the actual Foxlibot.py.</Description>
     <Copyright>FoxliCorp</Copyright>
     <PackageProjectUrl>https://github.com/Foxlider/FoxliBot/tree/DiVA</PackageProjectUrl>
@@ -20,24 +20,18 @@
     <PackageReleaseNotes></PackageReleaseNotes>
     <Configurations>Debug;Release;DebugVerbose</Configurations>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DocumentationFile></DocumentationFile>
-    <OutputPath></OutputPath>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugVerbose|AnyCPU'">
     <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <OutputPath></OutputPath>
-    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>..\DiVA.xml</DocumentationFile>
-    <OutputPath></OutputPath>
+    <DocumentationFile>C:\Users\alexis_lonchambon\Documents\Code\DiVA\DiVA\DiVA.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -51,6 +45,8 @@
   <ItemGroup>
     <Reference Include="System">
       <HintPath>System</HintPath>
+      <Private>true</Private>
+      <Aliases>System</Aliases>
     </Reference>
   </ItemGroup>
 

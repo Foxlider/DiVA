@@ -14,6 +14,16 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
+/// <summary>
+/// PROGRAM : DiVA Discord Virtual Assistant
+///
+/// Notes :
+/// System.dll is supposed to be in C:\Users\($user)\.nuget\packages\microsoft.netcore.app\3.0.0-preview-27122-01\ref\netcoreapp3.0\System.dll
+/// </summary>
+
+
+
+
 namespace DiVA
 {
     class DiVA
@@ -101,9 +111,7 @@ namespace DiVA
             if (verbose)
             { loglvl = LogSeverity.Debug; }
             client = new DiscordSocketClient(new DiscordSocketConfig
-            {
-                LogLevel = loglvl
-            });
+            { LogLevel = LogSeverity.Debug });
             client.Log += LogMessage;
             commands = new CommandService();
 
@@ -228,7 +236,7 @@ namespace DiVA
         /// <returns></returns>
         private async Task UserLeftGuildHandler(SocketGuildUser param)
         {
-            //Random _rnd = new Random();
+            Random _rnd = new Random();
             var channel = client.GetChannel(param.Guild.DefaultChannel.Id) as SocketTextChannel;
             await channel.SendMessageAsync($"{param.Mention} left us... Say bye ! ");
         }

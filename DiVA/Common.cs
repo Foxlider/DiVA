@@ -26,7 +26,7 @@ namespace DiVA.Modules
         private readonly CommandService _service;
         private readonly IConfigurationRoot _config;
         private readonly DiscordSocketClient _client;
-        readonly Random __rnd = new Random();
+        Random __rnd = new Random();
 
         /// <summary>
         /// Common Commands module builder
@@ -40,7 +40,7 @@ namespace DiVA.Modules
         }
 
         #region COMMANDS
-
+        
         #region echo
         /// <summary>
         /// SAY - Echos a message
@@ -95,6 +95,7 @@ namespace DiVA.Modules
         [Alias("hi")]
         public async Task Hello()
         {
+            var choice = __rnd.Next(10);
             await CommandHelper.SayHelloAsync(Context.Channel, Context.Client, Context.User, __rnd);
             try
             { await Context.Message.DeleteAsync(); }
@@ -117,14 +118,14 @@ namespace DiVA.Modules
             catch {}
             var userInfo = user ?? Context.Client.CurrentUser;
             var builder = new EmbedBuilder();
-            _ = new EmbedFieldBuilder
+            EmbedFieldBuilder field = new EmbedFieldBuilder
             {
                 IsInline = false
             };
 
             builder.WithTitle($"User Informations");
             builder.WithDescription($"Informations of {userInfo.Mention} - {userInfo.Username}#{userInfo.Discriminator}");
-            EmbedFieldBuilder field;
+
             if (userInfo.IsBot)
             {
                 field = new EmbedFieldBuilder
@@ -344,17 +345,15 @@ namespace DiVA.Modules
             string answer = "";
             string chosenOne = choices[_rnd.Next(choices.Length)];
             if (choices[0].StartsWith("<@") && choices[0].EndsWith(">"))
-            {
-                answer = chosenOne;
-            }
+            { answer = chosenOne; }
             else
             {
                 foreach (string word in choices)
                 {
                     if (word == chosenOne)
-                        answer += $" **{word}**";
+                    { answer += $" **{word}**"; }
                     else
-                        answer += $" {word}";
+                    { answer += $" {word}"; }
                 }
             }
             //if(choices[0].StartsWith("<@") && choices[0])
@@ -362,7 +361,7 @@ namespace DiVA.Modules
             await ReplyAsync(answer);
             try
             { await Context.Message.DeleteAsync(); }
-            catch {}
+            catch { }
         }
 
         #endregion choose
@@ -377,7 +376,7 @@ namespace DiVA.Modules
         [Alias("r")]
         public async Task Roll(string dice)
         {
-
+            
             try
             {
                 var result = dice
@@ -478,7 +477,7 @@ namespace DiVA.Modules
             try
             { await Context.Message.DeleteAsync(); }
             catch {}
-            if (stat == null || stat == "")
+            if ( stat == null ||stat == "")
                 await _client.SetGameAsync($"Ready to meet {Assembly.GetExecutingAssembly().GetName().Name} v{DiVA.GetVersion()} ?");
             else
                 await _client.SetGameAsync(stat);
@@ -486,15 +485,15 @@ namespace DiVA.Modules
 
         #endregion status
 
-
         #region cmdtest
         /// <summary>
         /// Tests the console
         /// </summary>
+        /// <param name="stat"></param>
         /// <returns></returns>
         [Command("consoletest")]
         [Summary("TestConsole")]
-        public async Task ConsoleTest()
+        public async Task ConsoleTest(string stat = "")
         {
             try
             { await Context.Message.DeleteAsync(); }
@@ -605,41 +604,43 @@ namespace DiVA.Modules
             {
                 await Context.Channel.TriggerTypingAsync();
                 DownloadedVideo video = await YouTubeDownloadService.GetVideoData(url);
-                try
-                { await Context.Message.DeleteAsync(); }
-                catch {}
-                if (!File.Exists(Path.Combine("Songs", $"{video.DisplayID}.mp3")))
-                {
-                    var downloadAnnouncement = await ReplyAsync($"{Context.User.Mention} attempting to download {url}");
-                    video = await YoutubeDownloadService.DownloadVideo(video);
-                    try
-                    { await downloadAnnouncement.DeleteAsync(); }
-                    catch {}
-                }
-
                 if (video == null)
                 {
                     await ReplyAsync($"{Context.User.Mention} unable to queue song, make sure its is a valid supported URL or contact a server admin.");
                     return;
                 }
-
-                video.Requester = Context.User.Mention;
-
-                await ReplyAsync($"{Context.User.Mention} queued **{video.Title}** | `{TimeSpan.FromSeconds(video.Duration)}`");
                 var _voiceChannel = (Context.User as IGuildUser)?.VoiceChannel;
                 if (_voiceChannel == null)
                 {
                     Log.Warning("Error joining Voice Channel!", "Audio Request");
                     await ReplyAsync($"I can't connect to your Voice Channel.");
                 }
-                else
-                { SongService.Queue(video, _voiceChannel, Context.Message.Channel); }
+
+                Log.Verbose($"Got video informations from YouTube API\n" +
+                          $"{url} :: {video.Title} ({video.Uri})", "Command Queue");
+                try
+                { await Context.Message.DeleteAsync(); }
+                catch {}
+                if (!File.Exists(Path.Combine("Songs", $"{video.DisplayID}.mp3")))
+                {
+                    Log.Verbose($"Audio not in cache folder. Starting download...", "Command Queue");
+                    var downloadAnnouncement = await ReplyAsync($"{Context.User.Mention} attempting to download {url}");
+                    video = await YoutubeDownloadService.DownloadVideo(video);
+                    try
+                    { await downloadAnnouncement.DeleteAsync(); }
+                    catch {}
+                }
+                Log.Verbose($"Starting audio playback.", "Command Queue");
+                video.Requester = Context.User.Mention;
+
+                await ReplyAsync($"{Context.User.Mention} queued **{video.Title}** | `{TimeSpan.FromSeconds(video.Duration)}`");
+                SongService.Queue(video, _voiceChannel, Context.Message.Channel);
             }
             catch (Exception e)
             { Log.Warning($"Error while processing song requet: {e}", "Audio Request"); }
         }
         #endregion
-
+        
         #region test
         /// <summary>
         /// TEST - Sound test (watch your ears)
@@ -796,16 +797,16 @@ namespace DiVA.Modules
             { await ReplyAsync($"{Context.User.Mention} now playing `{songlist.FirstOrDefault().Title}` requested by {songlist.FirstOrDefault().Requester}"); }
         }
         #endregion
-
+        
         #endregion
     }
-
+    
     /// <summary>
     /// Cache handler group
     /// </summary>
-    [Group("cache")]
-    [RequireUserPermission(GuildPermission.ManageGuild)]
-    public class Cache : ModuleBase
+    [Group("sudo")]
+    [RequireUserPermission(GuildPermission.Administrator)]
+    public class Admin : ModuleBase
     {
         #region CACHE COMMANDS
 
@@ -814,7 +815,7 @@ namespace DiVA.Modules
         /// CACHE LIST - List the cached music files
         /// </summary>
         /// <returns></returns>
-        [Command("list"), Summary("Displays the list of cached videos")]
+        [Command("cachelist"), Summary("Displays the list of cached videos")]
         public async Task DisplayList()
         {
             try
@@ -827,10 +828,8 @@ namespace DiVA.Modules
                     builder.WithDescription($"List of songs downloaded\n");
                     foreach (var line in File.ReadAllLines(Path.Combine(cachePath, "songlist.cache")))
                     {
-                        //The line is in CSV format : "{SongName}, {Filename.mp3};\n"
                         var filename = line.Split(",").Last().Trim(';');
-                        var title = line.Substring(0, line.Length - (filename.Length + 2));
-                        //Addign field to the Embed builder
+                        var title = line.Substring(0, line.Length-(filename.Length + 2));
                         var field = new EmbedFieldBuilder
                         {
                             IsInline = false,
@@ -864,9 +863,8 @@ namespace DiVA.Modules
         /// CACHE DELETE - Delete cached files
         /// </summary>
         /// <returns></returns>
-        [Command("delete"), Summary("Delete cache files")]
-        [RequireUserPermission(GuildPermission.Administrator)]
-        public async Task Delete(string input = null)
+        [Command("cachedel"), Summary("Delete cache files")]
+        public async Task Delete(string input=null)
         {
             string cachePath = Path.Combine(AppContext.BaseDirectory, "Songs");
             DirectoryInfo d = new DirectoryInfo(cachePath);
@@ -899,6 +897,22 @@ namespace DiVA.Modules
             catch {}
         }
         #endregion
+
+        [Command("loglvl"), Summary("Delete cache files")]
+        public async Task LogLevel(ushort log = 10)
+        {
+            try
+            { await Context.Message.DeleteAsync(); }
+            catch { }
+            if (log <= 5)
+            {
+                DiVA.logLvl = log;
+                await Context.User.SendMessageAsync($"Setting Log Level to {log}");
+            }
+            else
+            { await Context.User.SendMessageAsync($"Please enter a value between 0 (Critical Messages) and 5(Debug messages)"); }
+        }
+
 
         #endregion
     }
