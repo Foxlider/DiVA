@@ -1,3 +1,7 @@
+![GitHub release](https://img.shields.io/github/release/Foxlider/DiVA.svg?style=flat-square)
+![GitHub](https://img.shields.io/github/license/Foxlider/DiVA.svg?style=flat-square)
+![AppVeyor](https://img.shields.io/appveyor/ci/Foxlider/DiVA.svg?logo=appveyor&style=flat-square)
+
 # DiVA
 DiVA Discord Bot created to replace FoxliBot
 Written in C# - .NET Core 3.0
@@ -33,12 +37,29 @@ THE END
 
 
 # Changelog
-No true release yet
 
-## [ Version 0.4 ]
-###   [ 0.4b ]
- - Initial release
+## [ Version 1 ]  
+###   [ v1.0 ]
+ - Initial release  
+###   [ v1.1 ]  
+Fixed :  
+- Fixed version not displaying correctly  
+- Some minor code fixes  
+- Some minor typo fixes  
+###   [ v1.3 ]  
+ Added :  
+ - Direct Message logging  
+ - SentTo command  
+ - Poll command  
 
+Fixed :  
+- Cleaned up some code  
+- Fixed typo  
+###   [ v1.4 ]  
+Added :  
+ - Better Logging  
+ - Log commands  
 
-## TO DO
-Install script ! 
+Fixed :
+- Audio not working
+
