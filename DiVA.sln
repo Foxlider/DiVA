@@ -1,11 +1,16 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.168
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28606.126
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiVA", "DiVA\DiVA.csproj", "{0A2AFB82-A984-43D4-AB29-3D5B36495F9B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiVATests", "DiVATests\DiVATests.csproj", "{DF68EA8A-CD27-4442-A2B9-8920D5B65BD2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E6CDF63C-A1F1-4C51-B100-51E7AA0EDFF6}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

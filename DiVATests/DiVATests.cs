@@ -46,7 +46,7 @@ namespace Tests
         private Mock<ICommandContext> CreateMockContext(string command)
         {
             if (!command.StartsWith(".."))
-                command = ".." + command;
+            { command = ".." + command; }
             var Context = new Mock<ICommandContext>();
             Context.Setup(ctx => ctx.User).Returns(CreateMockGuildUser("Foxlider", "Keelah").Object);
             Context.Setup(ctx => ctx.Guild).Returns(CreateMockGuild().Object);
@@ -58,7 +58,7 @@ namespace Tests
         private Mock<IUserMessage> CreateMockMessage(string content, IUser author = null, ulong ID = 540152386141028362)
         {
             if (author == null)
-                author = CreateMockGuildUser("Foxlider", "Keelah").Object;
+            { author = CreateMockGuildUser("Foxlider", "Keelah").Object; }
             var Message = new Mock<IUserMessage>();
             Message.Setup(msg => msg.Channel).Returns(CreateMockChannel().Object);
             Message.Setup(msg => msg.Id).Returns(ID);

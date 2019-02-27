@@ -38,9 +38,9 @@ namespace DiVA
         private Task OnLogAsync(LogMessage msg)
         {
             if (!Directory.Exists(_logDirectory))     // Create the log directory if it doesn't exist
-                Directory.CreateDirectory(_logDirectory);
+            { Directory.CreateDirectory(_logDirectory); }
             if (!File.Exists(_logFile))               // Create today's log file if it doesn't exist
-                File.Create(_logFile).Dispose();
+            { File.Create(_logFile).Dispose(); }
 
             string logText = $"{DateTime.UtcNow.ToString("hh:mm:ss")} [{msg.Severity}] {msg.Source}: {msg.Exception?.ToString() ?? msg.Message}";
             File.AppendAllText(_logFile, logText + "\n");     // Write the log text to a file
@@ -94,7 +94,7 @@ namespace DiVA
         /// </summary>
         /// <param name="message"></param>
         /// <param name="source"></param>
-        public static void Debug(string message, string source)
+        public static void Debug(string message, string source = "")
         {
             if (DiVA.logLvl >= 5)
             {
@@ -112,7 +112,7 @@ namespace DiVA
         /// </summary>
         /// <param name="message"></param>
         /// <param name="source"></param>
-        public static void Verbose(string message, string source)
+        public static void Verbose(string message, string source = "")
         {
             if (DiVA.logLvl >= 4)
             {
@@ -130,7 +130,7 @@ namespace DiVA
         /// </summary>
         /// <param name="message"></param>
         /// <param name="source"></param>
-        public static void Error(string message, string source)
+        public static void Error(string message, string source = "")
         {
             if (DiVA.logLvl >= 1)
             {
@@ -148,7 +148,7 @@ namespace DiVA
         /// </summary>
         /// <param name="message"></param>
         /// <param name="source"></param>
-        public static void Critical(string message, string source)
+        public static void Critical(string message, string source = "")
         {
             if (DiVA.logLvl >= 0)
             {

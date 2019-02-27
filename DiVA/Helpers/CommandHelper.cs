@@ -38,7 +38,7 @@ namespace DiVA.Helpers
             };
             var msg = hiList[_rnd.Next(hiList.Count - 1)];
             if (iAm)
-                msg += $"\n{IAmList[_rnd.Next(IAmList.Count - 1)]}";
+            { msg += $"\n{IAmList[_rnd.Next(IAmList.Count - 1)]}"; }
             await Channel.SendMessageAsync(msg);
         }
     }

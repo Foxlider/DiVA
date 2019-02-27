@@ -22,17 +22,17 @@ namespace DiVA.Services
         {
             _currentProcess = CreateStream(path);
             
-            await Task.Delay(2000);
+            await Task.Delay(2000).ConfigureAwait(false);
             while (true)
             {
                 if (_currentProcess.HasExited)
-                    break;
+                { break; }
                 int blockSize = 2880;
                 byte[] buffer = new byte[blockSize];
                 int byteCount;
                 byteCount = await _currentProcess.StandardOutput.BaseStream.ReadAsync(buffer, 0, blockSize);
                 if (byteCount == 0)
-                    break;
+                { break; }
                 await stream.WriteAsync(buffer, 0, byteCount);
             }
             await stream.FlushAsync();
@@ -44,7 +44,7 @@ namespace DiVA.Services
         public void StopCurrentOperation()
         {
             _currentProcess?.Close();
-            //_currentProcess?.Kill();
+            //We shound not need this if we dispose it _currentProcess?.Kill();
             _currentProcess?.Dispose();
         }
 
