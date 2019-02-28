@@ -26,7 +26,7 @@ using System.Threading.Tasks;
 
 namespace DiVA
 {
-    class DiVA
+    public class DiVA
     {
         private CommandService commands;
         public static DiscordSocketClient client;

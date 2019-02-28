@@ -9,6 +9,9 @@ using Microsoft.Extensions.DependencyInjection;
 using DiVA.Services.YouTube;
 using DiVA.Services;
 using System.Reflection;
+using System.Linq;
+using Microsoft.Extensions.Configuration;
+using System.Collections.Generic;
 
 namespace Tests
 {
@@ -34,14 +37,90 @@ namespace Tests
         [Test]
         public async System.Threading.Tasks.Task TestGetVideoInformationsAsync()
         {
+            var builder = new ConfigurationBuilder()        // Create a new instance of the config builder
+                          .SetBasePath(AppContext.BaseDirectory)      // Specify the default location for the config file
+                          .AddJsonFile("config.json");        // Add this (json encoded) file to the configuration
+            DiVA.DiVA.Configuration = builder.Build();                // Build the configuration
+
             var response = await YouTubeDownloadService.GetVideoData("Genesis - That's All (Official Music Video)");
             DownloadedVideo video = response;
             Assert.AreEqual(video.Title, "Genesis - That's All (Official Music Video)");
-            Assert.AreEqual(video.Duration, 262);
+            Assert.AreEqual(video.Duration, 263);
             Assert.AreEqual(video.Url, "https://www.youtube.com/watch?v=khg2sloLzTI");
             Assert.AreEqual(video.DisplayID, "khg2sloLzTI");
-            Assert.AreEqual(video.FileName, "Genesis - That's All (Official Music Video)-khg2sloLzTI.mp4");
+            Assert.AreEqual(video.FileName, "khg2sloLzTI.mp3");
         }
+
+        [Test]
+        public void TestLog()
+        {
+            Assert.DoesNotThrow(delegate
+            {
+                Log.Critical("Test", "TEST");
+                Log.Debug("Test", "TEST");
+                Log.Error("Test", "TEST");
+                Log.Information("Test", "TEST");
+                Log.Neutral("Test", "TEST");
+                Log.Verbose("Test", "TEST");
+                Log.Warning("Test", "TEST");
+
+                Log.Critical("Test");
+                Log.Debug("Test");
+                Log.Error("Test");
+                Log.Information("Test");
+                Log.Neutral("Test");
+                Log.Verbose("Test");
+                Log.Warning("Test");
+
+                Log.Message(LogSeverity.Warning, "test", "TEST");
+                Log.Message(LogSeverity.Verbose, "test", "TEST");
+                Log.Message(LogSeverity.Info, "test", "TEST");
+                Log.Message(LogSeverity.Error, "test", "TEST");
+                Log.Message(LogSeverity.Debug, "test", "TEST");
+                Log.Message(LogSeverity.Critical, "test", "TEST");
+
+                Log.Message(LogSeverity.Warning, "test");
+                Log.Message(LogSeverity.Verbose, "test");
+                Log.Message(LogSeverity.Info, "test");
+                Log.Message(LogSeverity.Error, "test");
+                Log.Message(LogSeverity.Debug, "test");
+                Log.Message(LogSeverity.Critical, "test");
+            });
+        }
+
+
+        [Test]
+        public void TestAudioQueue()
+        {
+            IGuild guild = CreateMockGuild().Object;
+
+            AudioService service = new AudioService();
+            VoiceConnexion connexion = new VoiceConnexion
+            { Queue = new List<IPlayable>() };
+
+            service.ConnectedChannels.TryAdd(guild.Id, connexion);
+            service.ConnectedChannels.TryGetValue(guild.Id, out VoiceConnexion voice);
+            DownloadedVideo video = new DownloadedVideo("TITLE", 5, "http://url.com", "YoutubeID", "YoutubeID.mp3");
+            voice.Queue.Add(video);
+
+            Assert.AreEqual(voice.Queue.FirstOrDefault().DurationString, video.DurationString);
+            Assert.AreEqual(voice.Queue.FirstOrDefault().Title, video.Title);
+            Assert.AreEqual(voice.Queue.FirstOrDefault().Uri, video.Uri);
+            Assert.AreEqual(voice.Queue.FirstOrDefault().Url, video.Url);
+
+
+            var songlist = service.SongList(guild);
+            Assert.AreEqual(songlist.FirstOrDefault().DurationString, video.DurationString);
+            Assert.AreEqual(songlist.FirstOrDefault().Title, video.Title);
+            Assert.AreEqual(songlist.FirstOrDefault().Uri, video.Uri);
+            Assert.AreEqual(songlist.FirstOrDefault().Url, video.Url);
+
+            var list = service.Clear(guild);
+            Assert.AreEqual(list.Count, 0);
+        }
+
+
+#region mocks
 
         private Mock<ICommandContext> CreateMockContext(string command)
         {
@@ -95,5 +174,6 @@ namespace Tests
             Guild.Setup(guild => guild.Name).Returns(guildname);
             return Guild;
         }
+        #endregion
     }
 }
