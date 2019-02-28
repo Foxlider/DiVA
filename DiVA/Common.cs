@@ -466,6 +466,7 @@ namespace DiVA.Modules
         /// <returns></returns>
         [Command("status")]
         [Summary("Change the status of the bot")]
+        [RequireUserPermission(GuildPermission.Administrator)]
         public async Task Status(string stat = "")
         {
             try
