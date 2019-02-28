@@ -12,6 +12,7 @@ using System.Reflection;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Tests
 {
@@ -38,9 +39,11 @@ namespace Tests
         [Test]
         public async System.Threading.Tasks.Task TestGetVideoInformationsAsync()
         {
+            string[] files = Directory.GetFiles(AppContext.BaseDirectory, "config.json", SearchOption.AllDirectories);
+            
             var builder = new ConfigurationBuilder()        // Create a new instance of the config builder
-                          .SetBasePath(AppContext.BaseDirectory)      // Specify the default location for the config file
-                          .AddJsonFile("config.json");        // Add this (json encoded) file to the configuration
+                          .SetBasePath(Path.GetDirectoryName(files[0]))      // Specify the default location for the config file
+                          .AddJsonFile(Path.GetFileName(files[0]));        // Add this (json encoded) file to the configuration
             DiVA.DiVA.Configuration = builder.Build();                // Build the configuration
 
             var response = await YouTubeDownloadService.GetVideoData("Genesis - That's All (Official Music Video)");
