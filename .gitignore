@@ -9,6 +9,8 @@
 *.csproj.user
 *.userosscache
 *.sln.docstates
+*config.json
+
 
 /Songs/*
 
@@ -28,7 +30,9 @@
 /obj/*
 /Versions/
 /Versions/*
-~$mdp_keystores.xlsx
+DiVATests/bin/*
+DiVATests/obj/*
+!/DiVATests/bin/Debug/netcoreapp3.0
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
