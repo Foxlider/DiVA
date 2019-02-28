@@ -22,21 +22,28 @@
 /Components/*
 # /packages/
 # /packages/*
+/packages_old/
 /packages_old/*
+/bin/
+/bin/*
 /obj/
+/obj/*
 /Versions/
 /Versions/*
-DiVA/bin/
-DiVA/bin/*
-!/DiVATests/bin/Debug/netcoreapp3.0/
+~$mdp_keystores.xlsx
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
 # Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
 x64/
 x86/
 bld/
+[Bb]in/
 [Oo]bj/
 [Ll]og/
 
