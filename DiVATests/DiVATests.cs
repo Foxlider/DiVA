@@ -15,6 +15,7 @@ using System.Collections.Generic;
 
 namespace Tests
 {
+    [TestFixture, Category("MainTests")]
     public class Tests
     {
         [SetUp]
