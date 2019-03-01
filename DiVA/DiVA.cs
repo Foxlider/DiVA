@@ -26,13 +26,13 @@ using System.Threading.Tasks;
 
 namespace DiVA
 {
-    class DiVA
+    public class DiVA
     {
         private CommandService commands;
         public static DiscordSocketClient client;
         private IServiceProvider services;
         public static IConfigurationRoot Configuration;
-        public static bool DEV_MODE = false;
+        public const bool DEV_MODE = false;
         public static bool verbose = false;
         public static ushort logLvl = 3;
 
@@ -44,7 +44,6 @@ namespace DiVA
             var DiVA = new DiVA(args);
             await DiVA.RunAsync();
         }
-
 
         public DiVA(string[] args)
         {
@@ -80,7 +79,7 @@ namespace DiVA
 
         private void EchoHelp()
         {
-            Console.WriteLine($" __[ DiVA v{GetVersion()} ]__" +
+            Log.Neutral($" __[ DiVA v{GetVersion()} ]__" +
                 $"" +
                 $"Project Webpage: https://github.com/Foxlider/FoxliBot/tree/DiVA" +
                 $"" +
@@ -91,7 +90,7 @@ namespace DiVA
                 $"  -c --cache_cleanup          Delete the cache folder and its content." +
                 $"  -v --verbose                Display more information in the console for debug." +
                 $"  -h --help                   Print this message and exit" +
-                $"");
+                $"", "Help");
             Environment.Exit(0);
         }
 
@@ -107,9 +106,6 @@ namespace DiVA
                 $"{Assembly.GetExecutingAssembly().GetName().Name} " +
                 $"v{GetVersion()}\n" +
                 $"____________\n");
-            var loglvl = LogSeverity.Info;
-            if (verbose)
-            { loglvl = LogSeverity.Debug; }
             client = new DiscordSocketClient(new DiscordSocketConfig
             { LogLevel = LogSeverity.Debug });
             client.Log += LogMessage;
@@ -155,12 +151,6 @@ namespace DiVA
                         $"\t{guild.MemberCount} members", "DiVA Login");
                 }
                 Log.Neutral("\t_______________", "DiVA Login");
-                //ConsoleColor[] colors = (ConsoleColor[])ConsoleColor.GetValues(typeof(ConsoleColor));
-                //foreach (var color in colors)
-                //{
-                //    Console.ForegroundColor = color;
-                //    Console.WriteLine(" The foreground color is {0}.", color);
-                //}
                 Console.Title = $"{Assembly.GetExecutingAssembly().GetName().Name} v{GetVersion()}";
                 SetDefaultStatus();
                 return Task.CompletedTask;
@@ -202,19 +192,21 @@ namespace DiVA
         public async Task HandleCommand(SocketMessage messageParam)
         {
             // Don't process the command if it was a System Message
-            if (!(messageParam is SocketUserMessage message)) return;
+            if (!(messageParam is SocketUserMessage message))
+            { return; }
             if (message.Channel is IPrivateChannel)
             { Log.Neutral($"{message.Author} in {message.Channel.Name}\n    :: { message.Content}", "DirectMessage"); }
             // Create a number to track where the prefix ends and the command begins
             int argPos = 0;
-            if (!(message.HasStringPrefix(Configuration["prefix"], ref argPos) || message.HasMentionPrefix(client.CurrentUser, ref argPos))) return;
+            if (!(message.HasStringPrefix(Configuration["prefix"], ref argPos) || message.HasMentionPrefix(client.CurrentUser, ref argPos)))
+            { return; }
             // Create a Command Context
             var context = new CommandContext(client, message);
             // Execute the command. (result does not indicate a return value, 
             // rather an object stating if the command executed successfully)
             var result = await commands.ExecuteAsync(context, argPos, services);
             if (!result.IsSuccess)
-                await context.Channel.SendMessageAsync(result.ErrorReason);
+            { await context.Channel.SendMessageAsync(result.ErrorReason); }
         }
 
         /// <summary>
@@ -236,7 +228,6 @@ namespace DiVA
         /// <returns></returns>
         private async Task UserLeftGuildHandler(SocketGuildUser param)
         {
-            Random _rnd = new Random();
             var channel = client.GetChannel(param.Guild.DefaultChannel.Id) as SocketTextChannel;
             await channel.SendMessageAsync($"{param.Mention} left us... Say bye ! ");
         }
@@ -283,9 +274,7 @@ namespace DiVA
                 default:
                     break;
             }
-            //Console.WriteLine($"[{message.Severity} {message.Source}][{DateTime.Now.ToString()}] : {message.Message}");
             Log.Message(message.Severity, message.Message, message.Source);
-            //Console.ResetColor();
             return Task.CompletedTask;
         }
 
@@ -296,7 +285,8 @@ namespace DiVA
         public static bool TryGenerateConfiguration()
         {
             var filePath = Path.Combine(AppContext.BaseDirectory, "config.json");
-            if (File.Exists(filePath)) return false;
+            if (File.Exists(filePath))
+            { return false; }
             object config = new DiVAConfiguration();
             var json = JsonConvert.SerializeObject(config, Formatting.Indented);
             File.WriteAllText(filePath, json);
@@ -397,7 +387,7 @@ namespace DiVA
         /// Setting current status
         /// </summary>
         public void SetDefaultStatus()
-        { client.SetGameAsync($"Discord Virtual Assistant or DiVA v{GetVersion()}"); }
+        { client.SetGameAsync($"Discord Virtual Assistant or DiVA v{GetVersion()}", type: ActivityType.Watching); }
 
         /// <summary>
         /// Get current version
@@ -407,7 +397,7 @@ namespace DiVA
         {
             string rev = "b";
             if (DEV_MODE)
-                rev = "a";
+            { rev = "a"; }
             return $"{Assembly.GetExecutingAssembly().GetName().Version.Major}.{Assembly.GetExecutingAssembly().GetName().Version.Minor}{rev}";
         }
 

@@ -25,7 +25,7 @@ namespace DiVA.Services
         /// Service CTOR
         /// </summary>
         public AudioService()
-        { //_songQueue = new BufferBlock<IPlayable>(); 
+        { //Not used : _songQueue = new BufferBlock<IPlayable>(); 
         }
 
         /// <summary>

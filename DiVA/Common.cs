@@ -95,7 +95,6 @@ namespace DiVA.Modules
         [Alias("hi")]
         public async Task Hello()
         {
-            var choice = __rnd.Next(10);
             await CommandHelper.SayHelloAsync(Context.Channel, Context.Client, Context.User, __rnd);
             try
             { await Context.Message.DeleteAsync(); }
@@ -252,7 +251,6 @@ namespace DiVA.Modules
                     await ReplyAsync($"Sorry, I couldn't find a command like **{command}**.");
                     return;
                 }
-                string prefix = _config["prefix"];
                 var builder = new EmbedBuilder()
                 {
                     Color = new Color(114, 137, 218),
@@ -325,8 +323,6 @@ namespace DiVA.Modules
 
             var embed = builder.Build();
             await Context.Channel.SendMessageAsync("", false, embed);
-
-            //await ReplyAsync($"Hello {Context.User.Mention} ! I am {_client.CurrentUser.Username} v{DiVA.GetVersion()}.");
         }
 
         #endregion version
@@ -356,8 +352,6 @@ namespace DiVA.Modules
                     { answer += $" {word}"; }
                 }
             }
-            //if(choices[0].StartsWith("<@") && choices[0])
-            //await ReplyAsync(choices[_rnd.Next(choices.Length)]);
             await ReplyAsync(answer);
             try
             { await Context.Message.DeleteAsync(); }
@@ -472,15 +466,16 @@ namespace DiVA.Modules
         /// <returns></returns>
         [Command("status")]
         [Summary("Change the status of the bot")]
+        [RequireUserPermission(GuildPermission.Administrator)]
         public async Task Status(string stat = "")
         {
             try
             { await Context.Message.DeleteAsync(); }
             catch {}
             if ( stat == null ||stat == "")
-                await _client.SetGameAsync($"Ready to meet {Assembly.GetExecutingAssembly().GetName().Name} v{DiVA.GetVersion()} ?");
+            { await _client.SetGameAsync($"Ready to meet {Assembly.GetExecutingAssembly().GetName().Name} v{DiVA.GetVersion()} ?"); }
             else
-                await _client.SetGameAsync(stat);
+            { await _client.SetGameAsync(stat); }
         }
 
         #endregion status
@@ -552,7 +547,7 @@ namespace DiVA.Modules
                     await msg.AddReactionAsync(emoji);
                 }
             }
-            await Task.Delay(duration);
+            await Task.Delay(duration).ConfigureAwait(false);
 
             var finalMessage = await Context.Channel.GetMessageAsync(msg.Id) as IUserMessage;
 
@@ -727,8 +722,6 @@ namespace DiVA.Modules
         public async Task Stop()
         {
             SongService.Clear(Context.Guild);
-            //ConcurrentDictionary<ulong, IAudioClient> channels = SongService.ConnectedChannels;
-            //channels.TryGetValue(Context.Guild)
             await SongService.Quit(Context.Guild);
         }
         #endregion

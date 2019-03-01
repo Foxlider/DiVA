@@ -9,9 +9,14 @@ using Microsoft.Extensions.DependencyInjection;
 using DiVA.Services.YouTube;
 using DiVA.Services;
 using System.Reflection;
+using System.Linq;
+using Microsoft.Extensions.Configuration;
+using System.Collections.Generic;
+using System.IO;
 
 namespace Tests
 {
+    [TestFixture, Category("MainTests")]
     public class Tests
     {
         [SetUp]
@@ -34,19 +39,102 @@ namespace Tests
         [Test]
         public async System.Threading.Tasks.Task TestGetVideoInformationsAsync()
         {
-            var response = await YouTubeDownloadService.GetVideoData("Genesis - That's All (Official Music Video)");
-            DownloadedVideo video = response;
-            Assert.AreEqual(video.Title, "Genesis - That's All (Official Music Video)");
-            Assert.AreEqual(video.Duration, 262);
-            Assert.AreEqual(video.Url, "https://www.youtube.com/watch?v=khg2sloLzTI");
-            Assert.AreEqual(video.DisplayID, "khg2sloLzTI");
-            Assert.AreEqual(video.FileName, "Genesis - That's All (Official Music Video)-khg2sloLzTI.mp4");
+            string[] files = Directory.GetFiles(AppContext.BaseDirectory, "config.json", SearchOption.AllDirectories);
+            if (files.Length > 0)
+            {
+                var builder = new ConfigurationBuilder() // Create a new instance of the config builder
+                              .SetBasePath(
+                                  Path.GetDirectoryName(files[0])) // Specify the default location for the config file
+                              .AddJsonFile(
+                                  Path.GetFileName(files[0])); // Add this (json encoded) file to the configuration
+                DiVA.DiVA.Configuration = builder.Build(); // Build the configuration
+
+                var response = await YouTubeDownloadService.GetVideoData("Genesis - That's All (Official Music Video)");
+                DownloadedVideo video = response;
+                Assert.AreEqual(video.Title, "Genesis - That's All (Official Music Video)");
+                Assert.AreEqual(video.Duration, 263);
+                Assert.AreEqual(video.Url, "https://www.youtube.com/watch?v=khg2sloLzTI");
+                Assert.AreEqual(video.DisplayID, "khg2sloLzTI");
+                Assert.AreEqual(video.FileName, "khg2sloLzTI.mp3");
+            }
+            else { Assert.Pass("Could not find Config file. Setting to passed"); }
         }
+
+        [Test]
+        public void TestLog()
+        {
+            Assert.DoesNotThrow(delegate
+            {
+                Log.Critical("Test", "TEST");
+                Log.Debug("Test", "TEST");
+                Log.Error("Test", "TEST");
+                Log.Information("Test", "TEST");
+                Log.Neutral("Test", "TEST");
+                Log.Verbose("Test", "TEST");
+                Log.Warning("Test", "TEST");
+
+                Log.Critical("Test");
+                Log.Debug("Test");
+                Log.Error("Test");
+                Log.Information("Test");
+                Log.Neutral("Test");
+                Log.Verbose("Test");
+                Log.Warning("Test");
+
+                Log.Message(LogSeverity.Warning, "test", "TEST");
+                Log.Message(LogSeverity.Verbose, "test", "TEST");
+                Log.Message(LogSeverity.Info, "test", "TEST");
+                Log.Message(LogSeverity.Error, "test", "TEST");
+                Log.Message(LogSeverity.Debug, "test", "TEST");
+                Log.Message(LogSeverity.Critical, "test", "TEST");
+
+                Log.Message(LogSeverity.Warning, "test");
+                Log.Message(LogSeverity.Verbose, "test");
+                Log.Message(LogSeverity.Info, "test");
+                Log.Message(LogSeverity.Error, "test");
+                Log.Message(LogSeverity.Debug, "test");
+                Log.Message(LogSeverity.Critical, "test");
+            });
+        }
+
+
+        [Test]
+        public void TestAudioQueue()
+        {
+            IGuild guild = CreateMockGuild().Object;
+
+            AudioService service = new AudioService();
+            VoiceConnexion connexion = new VoiceConnexion
+            { Queue = new List<IPlayable>() };
+
+            service.ConnectedChannels.TryAdd(guild.Id, connexion);
+            service.ConnectedChannels.TryGetValue(guild.Id, out VoiceConnexion voice);
+            DownloadedVideo video = new DownloadedVideo("TITLE", 5, "http://url.com", "YoutubeID", "YoutubeID.mp3");
+            voice.Queue.Add(video);
+
+            Assert.AreEqual(voice.Queue.FirstOrDefault().DurationString, video.DurationString);
+            Assert.AreEqual(voice.Queue.FirstOrDefault().Title, video.Title);
+            Assert.AreEqual(voice.Queue.FirstOrDefault().Uri, video.Uri);
+            Assert.AreEqual(voice.Queue.FirstOrDefault().Url, video.Url);
+
+
+            var songlist = service.SongList(guild);
+            Assert.AreEqual(songlist.FirstOrDefault().DurationString, video.DurationString);
+            Assert.AreEqual(songlist.FirstOrDefault().Title, video.Title);
+            Assert.AreEqual(songlist.FirstOrDefault().Uri, video.Uri);
+            Assert.AreEqual(songlist.FirstOrDefault().Url, video.Url);
+
+            var list = service.Clear(guild);
+            Assert.AreEqual(list.Count, 0);
+        }
+
+
+#region mocks
 
         private Mock<ICommandContext> CreateMockContext(string command)
         {
             if (!command.StartsWith(".."))
-                command = ".." + command;
+            { command = ".." + command; }
             var Context = new Mock<ICommandContext>();
             Context.Setup(ctx => ctx.User).Returns(CreateMockGuildUser("Foxlider", "Keelah").Object);
             Context.Setup(ctx => ctx.Guild).Returns(CreateMockGuild().Object);
@@ -58,7 +146,7 @@ namespace Tests
         private Mock<IUserMessage> CreateMockMessage(string content, IUser author = null, ulong ID = 540152386141028362)
         {
             if (author == null)
-                author = CreateMockGuildUser("Foxlider", "Keelah").Object;
+            { author = CreateMockGuildUser("Foxlider", "Keelah").Object; }
             var Message = new Mock<IUserMessage>();
             Message.Setup(msg => msg.Channel).Returns(CreateMockChannel().Object);
             Message.Setup(msg => msg.Id).Returns(ID);
@@ -95,5 +183,6 @@ namespace Tests
             Guild.Setup(guild => guild.Name).Returns(guildname);
             return Guild;
         }
+        #endregion
     }
 }

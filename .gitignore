@@ -9,6 +9,8 @@
 *.csproj.user
 *.userosscache
 *.sln.docstates
+*config.json
+
 
 /Songs/*
 
