@@ -1,6 +1,7 @@
 ﻿using Google.Apis.Services;
 using Google.Apis.YouTube.v3;
 using Newtonsoft.Json;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
@@ -20,8 +21,10 @@ namespace DiVA.Services.YouTube
         /// <returns></returns>
         public async Task<DownloadedVideo> DownloadVideo(DownloadedVideo video)
         {
+            var outputPath = Path.Combine(AppContext.BaseDirectory, "Songs", video.DisplayID);
             var youtubeDl = StartYoutubeDl(
-                $"-o Songs/{video.DisplayID}.mp3 --restrict-filenames --extract-audio --no-overwrites --print-json --audio-format mp3 {video.Url}");
+                $"-x -f bestaudio --audio-quality 0 --audio-format mp3 --add-metadata --print-json -o \"{outputPath}.%(ext)s\" {video.Url}");
+                //$"-o {outputPath} --restrict-filenames --extract-audio --no-overwrites --print-json --audio-format mp3 {video.Url}");
 
             if (youtubeDl == null)
             {
@@ -33,7 +36,7 @@ namespace DiVA.Services.YouTube
             youtubeDl.WaitForExit();
             Log.Information($"Download completed with exit code {youtubeDl.ExitCode}", "Audio Download");
 
-            File.AppendAllText(Path.Combine("Songs", "songlist.cache"), $"{video.Title},{video.DisplayID}.mp3;\n");
+            File.AppendAllText(Path.Combine(AppContext.BaseDirectory, "Songs", "songlist.cache"), $"{video.Title},{video.DisplayID}.mp3;\n");
 
             return JsonConvert.DeserializeObject<DownloadedVideo>(jsonOutput);
         }

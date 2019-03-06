@@ -31,7 +31,7 @@ namespace DiVA.Services
         /// <summary>
         /// Playback service
         /// </summary>
-        public AudioPlaybackService AudioPlaybackService { get; set; }
+        //public AudioPlaybackService AudioPlaybackService { get; set; }
 
         /// <summary>
         /// NowPlaying var
@@ -47,7 +47,7 @@ namespace DiVA.Services
         {
             ConnectedChannels.TryGetValue(guild.Id, out VoiceConnexion voice);
             try
-            { AudioPlaybackService.StopCurrentOperation(); }
+            { voice.StopCurrentOperation(); }
             finally
             { Log.Verbose($"Stopped current audio stream for guild {voice.Channel.Guild.Name}", "Audio Quit"); }
             await voice.Channel.DisconnectAsync();
@@ -61,7 +61,7 @@ namespace DiVA.Services
         {
             ConnectedChannels.TryGetValue(Id, out VoiceConnexion voice);
             voice.Queue.Remove(voice.Queue.FirstOrDefault());
-            AudioPlaybackService.StopCurrentOperation();
+            voice.StopCurrentOperation();
         }
 
         /// <summary>
@@ -103,7 +103,7 @@ namespace DiVA.Services
                     Client = await voiceChannel.ConnectAsync()
                 };
                 if (ConnectedChannels.TryAdd(voiceChannel.Guild.Id, connexion))
-                { Log.Information("Connected!", "Audio Queue"); }
+                { Log.Information("Connected to voice", "Audio Queue"); }
                 Log.Verbose($"Connected to {ConnectedChannels.Count} guilds", "Audio Queue");
                 firstConnexion = true;
             }
@@ -111,7 +111,7 @@ namespace DiVA.Services
             ConnectedChannels.TryGetValue(voiceChannel.Guild.Id, out VoiceConnexion voice);
             voice.Queue.Add(video);
             if (firstConnexion)
-            { ProcessQueue(voiceChannel, messageChannel); }
+            { voice.ProcessQueue(voiceChannel, messageChannel, ConnectedChannels); }
         }
 
         /// <summary>
@@ -126,41 +126,19 @@ namespace DiVA.Services
             return voice.Queue;
         }
 
-        /// <summary>
-        /// Handled the Queue of a Voice Client
-        /// </summary>
-        /// <param name="voiceChannel"></param>
-        /// <param name="messageChannel"></param>
-        private async void ProcessQueue(IVoiceChannel voiceChannel, IMessageChannel messageChannel)
+        
+
+        internal float SetVolume(ulong id, int? vol)
         {
-            ConnectedChannels.TryGetValue(voiceChannel.Guild.Id, out VoiceConnexion voice);
-            using (var stream = voice.Client.CreatePCMStream(AudioApplication.Mixed, bitrate: 48000, bufferMillis: 2000))
-            {
-                while (voice.Queue.Count > 0)
-                {
-                    Log.Information("Waiting for songs", "Audio ProcessQueue");
-                    NowPlaying = voice.Queue.FirstOrDefault();
-                    try
-                    {
-                        await messageChannel?.SendMessageAsync($"Now playing **{NowPlaying.Title}** | `{NowPlaying.DurationString}` | requested by {NowPlaying.Requester}");
-                        await voice.Client.SetSpeakingAsync(true);
-                        try
-                        { await AudioPlaybackService.SendAsync(voice.Client, NowPlaying.FullPath, stream); }
-                        catch (OperationCanceledException)
-                        { Log.Verbose("Song have been skipped.", "Audio ProcessQueue"); }
-                        catch (InvalidOperationException)
-                        { Log.Verbose("Song have been skipped.", "Audio ProcessQueue"); }
-                        await voice.Client.SetSpeakingAsync(false);
-                        voice.Queue.Remove(NowPlaying);
-                        NowPlaying.OnPostPlay();
-                        Thread.Sleep(1000);
-                    }
-                    catch (Exception e)
-                    { Log.Warning($"Error while playing song: {e}", "Audio ProcessQueue"); }
-                }
-            }
-            await voice.Channel.DisconnectAsync();
-            ConnectedChannels.TryRemove(voiceChannel.Guild.Id, out VoiceConnexion tempVoice);
+            ConnectedChannels.TryGetValue(id, out VoiceConnexion voice);
+            voice.volume = (float)(vol/100.0);
+            return voice.volume;
+        }
+
+        internal object GetVolume(ulong id)
+        {
+            ConnectedChannels.TryGetValue(id, out VoiceConnexion voice);
+            return voice.volume;
         }
     }
 

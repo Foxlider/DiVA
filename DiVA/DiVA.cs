@@ -115,7 +115,7 @@ namespace DiVA
             ConfigureServices(serviceCollection);
             services = serviceCollection.BuildServiceProvider();
 
-            services.GetService<AudioService>().AudioPlaybackService = services.GetService<AudioPlaybackService>();
+            //services.GetService<AudioService>().AudioPlaybackService = services.GetService<AudioPlaybackService>();
 
             //services = new ServiceCollection().BuildServiceProvider();             // Create a new instance of a service collection
 
@@ -152,7 +152,7 @@ namespace DiVA
                 }
                 Log.Neutral("\t_______________", "DiVA Login");
                 Console.Title = $"{Assembly.GetExecutingAssembly().GetName().Name} v{GetVersion()}";
-                SetDefaultStatus();
+                SetDefaultStatus(client);
                 return Task.CompletedTask;
             };
             await Task.Delay(-1);
@@ -180,7 +180,7 @@ namespace DiVA
         {
             
             serviceCollection.AddSingleton(new YouTubeDownloadService());
-            serviceCollection.AddSingleton(new AudioPlaybackService());
+            //serviceCollection.AddSingleton(new AudioPlaybackService());
             serviceCollection.AddSingleton(new AudioService());
         }
 
@@ -386,8 +386,8 @@ namespace DiVA
         /// <summary>
         /// Setting current status
         /// </summary>
-        public void SetDefaultStatus()
-        { client.SetGameAsync($"Discord Virtual Assistant or DiVA v{GetVersion()}", type: ActivityType.Watching); }
+        public static async Task SetDefaultStatus(DiscordSocketClient client)
+        { await client.SetGameAsync($"Discord Virtual Assistant v{GetVersion()}", type: ActivityType.Watching); }
 
         /// <summary>
         /// Get current version
