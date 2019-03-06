@@ -1,4 +1,4 @@
-﻿namespace DiVA
+﻿ namespace DiVA
 {
     internal class DiVAConfiguration
     {

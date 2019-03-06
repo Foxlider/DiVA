@@ -11,6 +11,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DiVA.Modules
@@ -27,6 +28,26 @@ namespace DiVA.Modules
         private readonly IConfigurationRoot _config;
         private readonly DiscordSocketClient _client;
         Random __rnd = new Random();
+
+        /// <summary>
+        /// Override ReplyAsync
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="isTTS"></param>
+        /// <param name="embed"></param>
+        /// <param name="options"></param>
+        /// <param name="deleteafter"></param>
+        /// <returns></returns>
+        protected async Task<IUserMessage> ReplyAsync(string message = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, TimeSpan? deleteafter = null)
+        {
+            var msg = await base.ReplyAsync(message, isTTS, embed, options);
+            if (deleteafter != null)
+            {
+                Thread.Sleep(TimeSpan.FromMilliseconds(deleteafter.Value.TotalMilliseconds));
+                await msg.DeleteAsync();
+            }
+            return msg;
+        }
 
         /// <summary>
         /// Common Commands module builder
@@ -473,9 +494,9 @@ namespace DiVA.Modules
             { await Context.Message.DeleteAsync(); }
             catch {}
             if ( stat == null ||stat == "")
-            { await _client.SetGameAsync($"Ready to meet {Assembly.GetExecutingAssembly().GetName().Name} v{DiVA.GetVersion()} ?"); }
+            { await DiVA.SetDefaultStatus(_client); }
             else
-            { await _client.SetGameAsync(stat); }
+            { await _client.SetGameAsync(stat, type: ActivityType.Watching); }
         }
 
         #endregion status
@@ -510,6 +531,9 @@ namespace DiVA.Modules
     [Summary("Interactive commands for DiVA")]
     public class Interactive : ModuleBase
     {
+        #region INTERACTIVE COMMANDS
+
+        #region ping
         [Command("ping")]
         [Summary("Ping command for @Darlon")]
         [Alias("pong")] // alternative names for the command
@@ -519,7 +543,9 @@ namespace DiVA.Modules
             //Hi @Darlon !
             await ReplyAsync($"Pong!");
         }
+        #endregion
 
+        #region poll
         [Command("poll", RunMode = RunMode.Async), Summary("Run a poll with reactions.")]
         public async Task Poll([Summary("Duration (10s)")] TimeSpan duration, [Summary("Options (:ok_hand: :thumbsup:)")] params string[] options)
         {
@@ -562,6 +588,9 @@ namespace DiVA.Modules
             // and finally post the results
             await ReplyAsync($"Results : \n{string.Join("\n", results)}");
         }
+        #endregion
+
+        #endregion
     }
 
     /// <summary>
@@ -581,6 +610,25 @@ namespace DiVA.Modules
         /// </summary>
         public AudioService SongService { get; set; }
 
+        /// <summary>
+        /// Override ReplyAsync
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="isTTS"></param>
+        /// <param name="embed"></param>
+        /// <param name="options"></param>
+        /// <param name="deleteafter"></param>
+        /// <returns></returns>
+        protected async Task<IUserMessage> ReplyAsync(string message = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, int? deleteafter = null)
+        {
+            var msg = await base.ReplyAsync(message, isTTS, embed, options);
+            if (deleteafter != null)
+            {
+                Thread.Sleep((int)TimeSpan.FromSeconds((int)deleteafter).TotalMilliseconds);
+                await msg.DeleteAsync();
+            }
+            return msg;
+        }
 
         #region AUDIO COMMANDS
 
@@ -744,6 +792,37 @@ namespace DiVA.Modules
         }
         #endregion
 
+        #region volume
+        /// <summary>
+        /// VOLUME - Command volume
+        /// </summary>
+        /// <param name="vol"></param>
+        /// <returns></returns>
+        [Command("volume")]
+        [Alias("vol")]
+        [Summary("Changes the volume of a song")]
+        public async Task Volume(int? vol = null)
+        {
+            if (vol == null)
+            {
+                await ReplyAsync($"Current volume : {SongService.GetVolume(Context.Guild.Id)}", deleteafter: 5);
+                return;
+            }
+
+            if (vol < 0 || vol > 100)
+            {
+                await ReplyAsync("The volume needs to be between 0 and 100", deleteafter: 5);
+                return;
+            }
+
+            var volume = SongService.SetVolume(Context.Guild.Id, vol);
+            await ReplyAsync($"Volume set to {volume}%", deleteafter: 5);
+            try
+            { await Context.Message.DeleteAsync(); }
+            catch { }
+        }
+        #endregion
+
         #region queue
         /// <summary>
         /// QUEUE - Command queue
@@ -891,6 +970,11 @@ namespace DiVA.Modules
         }
         #endregion
 
+        #endregion
+
+        #region SUDO COMMANDS
+
+        #region loglvl
         [Command("loglvl"), Summary("Delete cache files")]
         public async Task LogLevel(ushort log = 10)
         {
@@ -905,7 +989,7 @@ namespace DiVA.Modules
             else
             { await Context.User.SendMessageAsync($"Please enter a value between 0 (Critical Messages) and 5(Debug messages)"); }
         }
-
+        #endregion
 
         #endregion
     }

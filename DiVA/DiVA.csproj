@@ -6,13 +6,13 @@
     <StartupObject>DiVA.DiVA</StartupObject>
     <ApplicationIcon />
     <Win32Resource />
-    <Version>1.5</Version>
+    <Version>1.6</Version>
     <Authors>Foxlider</Authors>
     <Company>FoxliCorp</Company>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <AssemblyName>DiVA</AssemblyName>
-    <AssemblyVersion>1.5.0.0</AssemblyVersion>
-    <FileVersion>1.5.0.0</FileVersion>
+    <AssemblyVersion>1.6.0.0</AssemblyVersion>
+    <FileVersion>1.6.0.0</FileVersion>
     <Description>DiVA is the bot written in C# to replace the actual Foxlibot.py.</Description>
     <Copyright>FoxliCorp</Copyright>
     <PackageProjectUrl>https://github.com/Foxlider/FoxliBot/tree/DiVA</PackageProjectUrl>
