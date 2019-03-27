@@ -51,7 +51,7 @@ namespace DiVA.Services
             {
                 while (Queue.Count > 0)
                 {
-                    Log.Information("Waiting for songs", "Audio ProcessQueue");
+                    Logger.Log(Logger.Info, "Waiting for songs", "Audio ProcessQueue");
                     NowPlaying = Queue.FirstOrDefault();
                     try
                     {
@@ -61,16 +61,16 @@ namespace DiVA.Services
                         try
                         { await SendAsync(volume, NowPlaying.FullPath, stream); }
                         catch (OperationCanceledException)
-                        { Log.Verbose("Song have been skipped.", "Audio ProcessQueue"); }
+                        { Logger.Log(Logger.Verbose, "Song have been skipped.", "Audio ProcessQueue"); }
                         catch (InvalidOperationException)
-                        { Log.Verbose("Song have been skipped.", "Audio ProcessQueue"); }
+                        { Logger.Log(Logger.Verbose, "Song have been skipped.", "Audio ProcessQueue"); }
                         await Client.SetSpeakingAsync(false);
                         Queue.Remove(NowPlaying);
                         NowPlaying.OnPostPlay();
                         Thread.Sleep(1000);
                     }
                     catch (Exception e)
-                    { Log.Warning($"Error while playing song: {e}", "Audio ProcessQueue"); }
+                    { Logger.Log(Logger.Warning, $"Error while playing song: {e}", "Audio ProcessQueue"); }
                 }
             }
             await Channel.DisconnectAsync();
@@ -165,7 +165,7 @@ namespace DiVA.Services
                 RedirectStandardOutput = true
             };
 
-            Log.Information($"Starting ffmpeg with args {ffmpeg.Arguments}", "Audio Create");
+            Logger.Log(Logger.Info, $"Starting ffmpeg with args {ffmpeg.Arguments}", "Audio Create");
             return Process.Start(ffmpeg);
         }
 

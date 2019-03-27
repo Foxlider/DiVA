@@ -49,7 +49,7 @@ namespace DiVA.Services
             try
             { voice.StopCurrentOperation(); }
             finally
-            { Log.Verbose($"Stopped current audio stream for guild {voice.Channel.Guild.Name}", "Audio Quit"); }
+            { Logger.Log(Logger.Verbose, $"Stopped current audio stream for guild {voice.Channel.Guild.Name}", "Audio Quit"); }
             await voice.Channel.DisconnectAsync();
             ConnectedChannels.TryRemove(voice.Channel.Guild.Id, out VoiceConnexion tempVoice);
         }
@@ -74,10 +74,13 @@ namespace DiVA.Services
             try
             {
                 ConnectedChannels.TryGetValue(guild.Id, out VoiceConnexion voice);
-                var songQueue = voice.Queue;
-                Log.Information($"Skipped {songQueue.Count} songs", "Audio Skip");
-                songQueue.Clear();
-                return songQueue;
+                Console.WriteLine(voice);
+                Console.WriteLine(voice.Queue);
+                Console.WriteLine(voice.Queue.Count);
+                Console.WriteLine(voice.Queue.FirstOrDefault().Title);
+                Logger.Log(Logger.Info, $"Skipped {voice.Queue.Count} songs", "Audio Skip");
+                voice.Queue.Clear();
+                return voice.Queue;
             }
             catch
             { return null; }
@@ -86,7 +89,6 @@ namespace DiVA.Services
         /// <summary>
         /// Add a song to the queue
         /// </summary>
-        /// <param name="guild"></param>
         /// <param name="video"></param>
         /// <param name="voiceChannel"></param>
         /// <param name="messageChannel"></param>
@@ -95,7 +97,7 @@ namespace DiVA.Services
             bool firstConnexion = false;
             if (!ConnectedChannels.TryGetValue(voiceChannel.Guild.Id, out VoiceConnexion tempsVoice))
             {
-                Log.Information("Connecting to voice channel", "Audio Queue");
+                Logger.Log(Logger.Info, "Connecting to voice channel", "Audio Queue");
                 VoiceConnexion connexion = new VoiceConnexion
                 {
                     Channel = voiceChannel,
@@ -103,13 +105,15 @@ namespace DiVA.Services
                     Client = await voiceChannel.ConnectAsync()
                 };
                 if (ConnectedChannels.TryAdd(voiceChannel.Guild.Id, connexion))
-                { Log.Information("Connected to voice", "Audio Queue"); }
-                Log.Verbose($"Connected to {ConnectedChannels.Count} guilds", "Audio Queue");
+                { Logger.Log(Logger.Info, "Connected to voice", "Audio Queue"); }
+                Logger.Log(Logger.Verbose, $"Connected to {ConnectedChannels.Count} guilds", "Audio Queue");
                 firstConnexion = true;
             }
-            Log.Verbose($"Added video : {video.Title} ({video.Uri})\n   to channel {voiceChannel.Guild.Name} :: {voiceChannel.Name}", "Audio Queue");
+            Logger.Log(Logger.Verbose, $"Added video : {video.Title} ({video.Uri})\n   to channel {voiceChannel.Guild.Name} :: {voiceChannel.Name}", "Audio Queue");
             ConnectedChannels.TryGetValue(voiceChannel.Guild.Id, out VoiceConnexion voice);
-            voice.Queue.Add(video);
+            lock(voice)
+            { voice.Queue.Add(video); }
+            
             if (firstConnexion)
             { voice.ProcessQueue(voiceChannel, messageChannel, ConnectedChannels); }
         }
@@ -122,7 +126,7 @@ namespace DiVA.Services
         public List<IPlayable> SongList(IGuild guild)
         {
             ConnectedChannels.TryGetValue(guild.Id, out VoiceConnexion voice);
-            Log.Verbose($"{voice.Queue.Count} songs registered.", "Audio");
+            Logger.Log(Logger.Verbose, $"{voice.Queue.Count} songs registered.", "Audio");
             return voice.Queue;
         }
 

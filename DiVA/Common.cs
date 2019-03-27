@@ -41,11 +41,14 @@ namespace DiVA.Modules
         protected async Task<IUserMessage> ReplyAsync(string message = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, TimeSpan? deleteafter = null)
         {
             var msg = await base.ReplyAsync(message, isTTS, embed, options);
-            if (deleteafter != null)
-            {
-                Thread.Sleep(TimeSpan.FromMilliseconds(deleteafter.Value.TotalMilliseconds));
-                await msg.DeleteAsync();
-            }
+            if (deleteafter == null) return msg;
+            var t = new Thread(async () =>
+                {
+                    Thread.Sleep(TimeSpan.FromMilliseconds(deleteafter.Value.TotalMilliseconds));
+                    await msg.DeleteAsync();
+                })
+                { IsBackground = true };
+            t.Start();
             return msg;
         }
 
@@ -55,7 +58,7 @@ namespace DiVA.Modules
         /// <param name="service"></param>
         public Common(CommandService service)
         {
-            _client = DiVA.client;
+            _client = DiVA.Client;
             _service = service;
             _config = DiVA.Configuration;
         }
@@ -75,7 +78,7 @@ namespace DiVA.Modules
         {
             try
             { await Context.Message.DeleteAsync(); }
-            finally {}
+            catch { /* ignored */ }
             await ReplyAsync(echo);
         }
 
@@ -90,7 +93,7 @@ namespace DiVA.Modules
         {
             try
             { await Context.Message.DeleteAsync(); }
-            catch {}
+            catch { /* ignored */ } 
             try
             {
                 if (await Context.Client.GetChannelAsync(discordId) is IMessageChannel channel)
@@ -119,7 +122,7 @@ namespace DiVA.Modules
             await CommandHelper.SayHelloAsync(Context.Channel, Context.Client, Context.User, __rnd);
             try
             { await Context.Message.DeleteAsync(); }
-            catch {}
+            catch { /* ignored */ } 
         }
         #endregion hello
 
@@ -135,13 +138,10 @@ namespace DiVA.Modules
         {
             try
             { await Context.Message.DeleteAsync(); }
-            catch {}
+            catch { /* ignored */ } 
             var userInfo = user ?? Context.Client.CurrentUser;
             var builder = new EmbedBuilder();
-            EmbedFieldBuilder field = new EmbedFieldBuilder
-            {
-                IsInline = false
-            };
+            EmbedFieldBuilder field;
 
             builder.WithTitle($"User Informations");
             builder.WithDescription($"Informations of {userInfo.Mention} - {userInfo.Username}#{userInfo.Discriminator}");
@@ -169,12 +169,7 @@ namespace DiVA.Modules
             var guildUser = (userInfo as IGuildUser);
             if (guildUser != null)
             {
-                field = new EmbedFieldBuilder
-                {
-                    IsInline = true,
-                    Name = "User joined at ",
-                    Value = guildUser.JoinedAt.Value.DateTime.ToString("g", CultureInfo.CreateSpecificCulture("fr-FR"))
-                };
+                if (guildUser.JoinedAt != null) field = new EmbedFieldBuilder { IsInline = true, Name = "User joined at ", Value = guildUser.JoinedAt.Value.DateTime.ToString("g", CultureInfo.CreateSpecificCulture("fr-FR")) };
                 builder.AddField(field);
 
                 var userPerms = guildUser.RoleIds;
@@ -228,7 +223,7 @@ namespace DiVA.Modules
             {
                 try
                 { await Context.Message.DeleteAsync(); }
-                catch {}
+                catch { /* ignored */ } 
                 string prefix = _config["prefix"];
                 var builder = new EmbedBuilder()
                 {
@@ -306,7 +301,7 @@ namespace DiVA.Modules
         {
             try
             { await Context.Message.DeleteAsync(); }
-            catch {}
+            catch { /* ignored */ } 
             var arch = System.Runtime.InteropServices.RuntimeInformation.OSArchitecture;
             var OSdesc = System.Runtime.InteropServices.RuntimeInformation.OSDescription;
 
@@ -425,7 +420,7 @@ namespace DiVA.Modules
             {
                 try
                 { await Context.Message.DeleteAsync(); }
-                catch {}
+                catch { /* ignored */ } 
             }
         }
         #endregion roll
@@ -473,7 +468,7 @@ namespace DiVA.Modules
             {
                 try
                 { await Context.Message.DeleteAsync(); }
-                catch {}
+                catch { /* ignored */ } 
             }
         }
 
@@ -492,7 +487,7 @@ namespace DiVA.Modules
         {
             try
             { await Context.Message.DeleteAsync(); }
-            catch {}
+            catch { /* ignored */ } 
             if ( stat == null ||stat == "")
             { await DiVA.SetDefaultStatus(_client); }
             else
@@ -513,14 +508,14 @@ namespace DiVA.Modules
         {
             try
             { await Context.Message.DeleteAsync(); }
-            catch {}
-            Log.Neutral("Neutral", "Commands ConsoleTest");
-            Log.Information("Information", "Commands ConsoleTest");
-            Log.Verbose("Verbose", "Commands ConsoleTest");
-            Log.Debug("Debug", "Commands ConsoleTest");
-            Log.Warning("Warning", "Commands ConsoleTest");
-            Log.Error("Error", "Commands ConsoleTest");
-            Log.Critical("Critical", "Commands ConsoleTest");
+            catch { /* ignored */ } 
+            Logger.Log(Logger.Neutral, "Neutral", "Commands ConsoleTest");
+            Logger.Log(Logger.Info, "Information", "Commands ConsoleTest");
+            Logger.Log(Logger.Verbose, "Verbose", "Commands ConsoleTest");
+            Logger.Log(Logger.Debug, "Debug", "Commands ConsoleTest");
+            Logger.Log(Logger.Warning, "Warning", "Commands ConsoleTest");
+            Logger.Log(Logger.Error, "Error", "Commands ConsoleTest");
+            Logger.Log(Logger.Critical, "Critical", "Commands ConsoleTest");
         }
         #endregion cmdtest
 
@@ -655,32 +650,32 @@ namespace DiVA.Modules
                 var _voiceChannel = (Context.User as IGuildUser)?.VoiceChannel;
                 if (_voiceChannel == null)
                 {
-                    Log.Warning("Error joining Voice Channel!", "Audio Request");
+                    Logger.Log(Logger.Warning, "Error joining Voice Channel!", "Audio Request");
                     await ReplyAsync($"I can't connect to your Voice Channel.");
                 }
 
-                Log.Verbose($"Got video informations from YouTube API\n" +
+                Logger.Log(Logger.Verbose, $"Got video informations from YouTube API\n" +
                           $"{url} :: {video.Title} ({video.Uri})", "Command Queue");
                 try
                 { await Context.Message.DeleteAsync(); }
-                catch {}
+                catch { /* ignored */ } 
                 if (!File.Exists(Path.Combine("Songs", $"{video.DisplayID}.mp3")))
                 {
-                    Log.Verbose($"Audio not in cache folder. Starting download...", "Command Queue");
+                    Logger.Log(Logger.Verbose, $"Audio not in cache folder. Starting download...", "Command Queue");
                     var downloadAnnouncement = await ReplyAsync($"{Context.User.Mention} attempting to download {url}");
                     video = await YoutubeDownloadService.DownloadVideo(video);
                     try
                     { await downloadAnnouncement.DeleteAsync(); }
-                    catch {}
+                    catch { /* ignored */ } 
                 }
-                Log.Verbose($"Starting audio playback.", "Command Queue");
+                Logger.Log(Logger.Verbose, $"Starting audio playback.", "Command Queue");
                 video.Requester = Context.User.Mention;
 
                 await ReplyAsync($"{Context.User.Mention} queued **{video.Title}** | `{TimeSpan.FromSeconds(video.Duration)}`");
                 SongService.Queue(video, _voiceChannel, Context.Message.Channel);
             }
             catch (Exception e)
-            { Log.Warning($"Error while processing song requet: {e}", "Audio Request"); }
+            { Logger.Log(Logger.Warning, $"Error while processing song requet: {e}", "Audio Request"); }
         }
         #endregion
         
@@ -718,7 +713,7 @@ namespace DiVA.Modules
                 var stream = await YouTubeDownloadService.GetLivestreamData(url);
                 try
                 { await downloadAnnouncement.DeleteAsync(); }
-                catch {}
+                catch { /* ignored */ } 
 
                 if (stream == null)
                 {
@@ -729,20 +724,20 @@ namespace DiVA.Modules
                 stream.Requester = Context.User.Mention;
                 stream.Url = url;
 
-                Log.Information($"Attempting to stream {stream}", "Audio Stream");
+                Logger.Log(Logger.Info, $"Attempting to stream {stream}", "Audio Stream");
 
                 await ReplyAsync($"{Context.User.Mention} queued **{stream.Title}** | `{stream.DurationString}`");
                 var _voiceChannel = (Context.User as IGuildUser)?.VoiceChannel;
                 if (_voiceChannel == null)
                 {
-                    Log.Warning("Error joining Voice Channel!", "Audio Stream");
+                    Logger.Log(Logger.Warning, "Error joining Voice Channel!", "Audio Stream");
                     await ReplyAsync($"I can't connect to your Voice Channel.");
                 }
                 else
                 { SongService.Queue(stream, _voiceChannel, Context.Message.Channel); }
             }
             catch (Exception e)
-            { Log.Warning($"Error while processing song requet: {e}", "Audio Stream"); }
+            { Logger.Log(Logger.Warning, $"Error while processing song requet: {e}", "Audio Stream"); }
         }
         #endregion
 
@@ -788,7 +783,7 @@ namespace DiVA.Modules
             await ReplyAsync("Skipped song");
             try
             { await Context.Message.DeleteAsync(); }
-            catch {}
+            catch { /* ignored */ } 
         }
         #endregion
 
@@ -925,7 +920,7 @@ namespace DiVA.Modules
             {
                 try
                 { await Context.Message.DeleteAsync(); }
-                catch {}
+                catch { /* ignored */ } 
             }
         }
         #endregion
@@ -966,7 +961,7 @@ namespace DiVA.Modules
             }
             try
             { await Context.Message.DeleteAsync(); }
-            catch {}
+            catch { /* ignored */ } 
         }
         #endregion
 
@@ -983,7 +978,7 @@ namespace DiVA.Modules
             catch { }
             if (log <= 5)
             {
-                DiVA.logLvl = log;
+                DiVA.LogLvl = log;
                 await Context.User.SendMessageAsync($"Setting Log Level to {log}");
             }
             else
