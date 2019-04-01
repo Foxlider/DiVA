@@ -7,8 +7,8 @@
 
         public DiVAConfiguration(string prefix = "..", Tokens token = null)
         {
-            this.Prefix = prefix;
-            this.Tokens = token;
+            Prefix = prefix;
+            Tokens = token;
         }
     }
     internal class Tokens
@@ -17,8 +17,8 @@
         public string Youtube { get; set; }
         public Tokens(string discord = "", string youtube = "")
         {
-            this.Discord = discord;
-            this.Youtube = youtube;
+            Discord = discord;
+            Youtube = youtube;
         }
     }
 }

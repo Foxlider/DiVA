@@ -19,11 +19,11 @@ namespace DiVA.Services.YouTube
         /// <param name="filename"></param>
         public DownloadedVideo(string title, int duration, string url, string id, string filename)
         {
-            this.Title = title;
-            this.Duration = duration;
-            this.Url = url;
-            this.DisplayID = id;
-            this.FileName = filename;
+            Title = title;
+            Duration = duration;
+            Url = url;
+            DisplayID = id;
+            FileName = filename;
         }
 
         /// <summary>

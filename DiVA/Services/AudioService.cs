@@ -3,8 +3,7 @@ using Discord.Audio;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
+using System.Linq; 
 using System.Threading.Tasks;
 
 namespace DiVA.Services
@@ -26,12 +25,7 @@ namespace DiVA.Services
         /// </summary>
         public AudioService()
         { //Not used : _songQueue = new BufferBlock<IPlayable>(); 
-        }
-
-        /// <summary>
-        /// Playback service
-        /// </summary>
-        //public AudioPlaybackService AudioPlaybackService { get; set; }
+        } 
 
         /// <summary>
         /// NowPlaying var
@@ -49,17 +43,17 @@ namespace DiVA.Services
             try
             { voice.StopCurrentOperation(); }
             finally
-            { Log.Verbose($"Stopped current audio stream for guild {voice.Channel.Guild.Name}", "Audio Quit"); }
+            { Logger.Log(Logger.Verbose, $"Stopped current audio stream for guild {voice.Channel.Guild.Name}", "Audio Quit"); }
             await voice.Channel.DisconnectAsync();
-            ConnectedChannels.TryRemove(voice.Channel.Guild.Id, out VoiceConnexion tempVoice);
+            ConnectedChannels.TryRemove(voice.Channel.Guild.Id, out VoiceConnexion _tempVoice);
         }
 
         /// <summary>
         /// Skips current song
         /// </summary>
-        public void Next(ulong Id)
+        public void Next(ulong id)
         {
-            ConnectedChannels.TryGetValue(Id, out VoiceConnexion voice);
+            ConnectedChannels.TryGetValue(id, out VoiceConnexion voice);
             voice.Queue.Remove(voice.Queue.FirstOrDefault());
             voice.StopCurrentOperation();
         }
@@ -74,10 +68,13 @@ namespace DiVA.Services
             try
             {
                 ConnectedChannels.TryGetValue(guild.Id, out VoiceConnexion voice);
-                var songQueue = voice.Queue;
-                Log.Information($"Skipped {songQueue.Count} songs", "Audio Skip");
-                songQueue.Clear();
-                return songQueue;
+                Console.WriteLine(voice);
+                Console.WriteLine(voice.Queue);
+                Console.WriteLine(voice.Queue.Count);
+                Console.WriteLine(voice.Queue.FirstOrDefault().Title);
+                Logger.Log(Logger.Info, $"Skipped {voice.Queue.Count} songs", "Audio Skip");
+                voice.Queue.Clear();
+                return voice.Queue;
             }
             catch
             { return null; }
@@ -86,7 +83,6 @@ namespace DiVA.Services
         /// <summary>
         /// Add a song to the queue
         /// </summary>
-        /// <param name="guild"></param>
         /// <param name="video"></param>
         /// <param name="voiceChannel"></param>
         /// <param name="messageChannel"></param>
@@ -95,7 +91,7 @@ namespace DiVA.Services
             bool firstConnexion = false;
             if (!ConnectedChannels.TryGetValue(voiceChannel.Guild.Id, out VoiceConnexion tempsVoice))
             {
-                Log.Information("Connecting to voice channel", "Audio Queue");
+                Logger.Log(Logger.Info, "Connecting to voice channel", "Audio Queue");
                 VoiceConnexion connexion = new VoiceConnexion
                 {
                     Channel = voiceChannel,
@@ -103,13 +99,15 @@ namespace DiVA.Services
                     Client = await voiceChannel.ConnectAsync()
                 };
                 if (ConnectedChannels.TryAdd(voiceChannel.Guild.Id, connexion))
-                { Log.Information("Connected to voice", "Audio Queue"); }
-                Log.Verbose($"Connected to {ConnectedChannels.Count} guilds", "Audio Queue");
+                { Logger.Log(Logger.Info, "Connected to voice", "Audio Queue"); }
+                Logger.Log(Logger.Verbose, $"Connected to {ConnectedChannels.Count} guilds", "Audio Queue");
                 firstConnexion = true;
             }
-            Log.Verbose($"Added video : {video.Title} ({video.Uri})\n   to channel {voiceChannel.Guild.Name} :: {voiceChannel.Name}", "Audio Queue");
+            Logger.Log(Logger.Verbose, $"Added video : {video.Title} ({video.Uri})\n   to channel {voiceChannel.Guild.Name} :: {voiceChannel.Name}", "Audio Queue");
             ConnectedChannels.TryGetValue(voiceChannel.Guild.Id, out VoiceConnexion voice);
-            voice.Queue.Add(video);
+            lock(voice)
+            { voice.Queue.Add(video); }
+            
             if (firstConnexion)
             { voice.ProcessQueue(voiceChannel, messageChannel, ConnectedChannels); }
         }
@@ -122,11 +120,29 @@ namespace DiVA.Services
         public List<IPlayable> SongList(IGuild guild)
         {
             ConnectedChannels.TryGetValue(guild.Id, out VoiceConnexion voice);
-            Log.Verbose($"{voice.Queue.Count} songs registered.", "Audio");
+            Logger.Log(Logger.Verbose, $"{voice.Queue.Count} songs registered.", "Audio");
             return voice.Queue;
         }
 
-        
+        public async void Say(string said, IVoiceChannel voiceChannel, string culture = "en-US")
+        {
+            if (!ConnectedChannels.TryGetValue(voiceChannel.Guild.Id, out VoiceConnexion tempsVoice))
+            {
+                Logger.Log(Logger.Info, "Connecting to voice channel", "Audio Queue");
+                VoiceConnexion connexion = new VoiceConnexion
+                {
+                    Channel = voiceChannel,
+                    Queue   = new List<IPlayable>(),
+                    Client  = await voiceChannel.ConnectAsync()
+                };
+                connexion.currentStream = connexion.Client.CreatePCMStream(AudioApplication.Mixed);
+                tempsVoice = connexion;
+                if (ConnectedChannels.TryAdd(voiceChannel.Guild.Id, connexion))
+                { Logger.Log(Logger.Info, "Connected to voice", "Audio Queue"); }
+                Logger.Log(Logger.Verbose, $"Connected to {ConnectedChannels.Count} guilds", "Audio Queue");
+            }
+            await tempsVoice.SayAsync(said, culture);
+        }
 
         internal float SetVolume(ulong id, int? vol)
         {

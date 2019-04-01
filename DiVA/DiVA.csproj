@@ -6,17 +6,17 @@
     <StartupObject>DiVA.DiVA</StartupObject>
     <ApplicationIcon />
     <Win32Resource />
-    <Version>1.6</Version>
+    <Version>1.8</Version>
     <Authors>Foxlider</Authors>
     <Company>FoxliCorp</Company>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <AssemblyName>DiVA</AssemblyName>
-    <AssemblyVersion>1.6.0.0</AssemblyVersion>
-    <FileVersion>1.6.0.0</FileVersion>
+    <AssemblyVersion>1.8.0.0</AssemblyVersion>
+    <FileVersion>1.7.0.0</FileVersion>
     <Description>DiVA is the bot written in C# to replace the actual Foxlibot.py.</Description>
     <Copyright>FoxliCorp</Copyright>
-    <PackageProjectUrl>https://github.com/Foxlider/FoxliBot/tree/DiVA</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/Foxlider/FoxliBot/tree/DiVA</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/Foxlider/DiVA</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Foxlider/DiVA</RepositoryUrl>
     <PackageReleaseNotes></PackageReleaseNotes>
     <Configurations>Debug;Release;DebugVerbose</Configurations>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
@@ -31,7 +31,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>C:\Users\alexis_lonchambon\Documents\Code\DiVA\DiVA\DiVA.xml</DocumentationFile>
+    <DocumentationFile>..\Docs\DiVA.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -64,6 +64,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="opus.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="TTSHelper.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="youtube-dl.exe">

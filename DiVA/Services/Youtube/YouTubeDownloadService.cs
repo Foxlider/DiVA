@@ -28,13 +28,13 @@ namespace DiVA.Services.YouTube
 
             if (youtubeDl == null)
             {
-                Log.Warning("Error: Unable to start process", "Audio Download");
+                Logger.Log(Logger.Warning, "Error: Unable to start process", "Audio Download");
                 return null;
             }
 
             var jsonOutput = await youtubeDl.StandardOutput.ReadToEndAsync();
             youtubeDl.WaitForExit();
-            Log.Information($"Download completed with exit code {youtubeDl.ExitCode}", "Audio Download");
+            Logger.Log(Logger.Info, $"Download completed with exit code {youtubeDl.ExitCode}", "Audio Download");
 
             File.AppendAllText(Path.Combine(AppContext.BaseDirectory, "Songs", "songlist.cache"), $"{video.Title},{video.DisplayID}.mp3;\n");
 
@@ -51,7 +51,7 @@ namespace DiVA.Services.YouTube
             var youtubeDl = StartYoutubeDl("--print-json --skip-download " + url);
             var jsonOutput = await youtubeDl.StandardOutput.ReadToEndAsync();
             youtubeDl.WaitForExit();
-            Log.Information($"Data recovery completed with exit code {youtubeDl.ExitCode}", "Audio Download");
+            Logger.Log(Logger.Info, $"Data recovery completed with exit code {youtubeDl.ExitCode}", "Audio Download");
 
             return JsonConvert.DeserializeObject<StreamMetadata>(jsonOutput);
         }
@@ -81,7 +81,7 @@ namespace DiVA.Services.YouTube
             var searchVideoResponse = await searchVideoRequest.ExecuteAsync();
             var video = searchVideoResponse.Items[0];
             int duration = (int)XmlConvert.ToTimeSpan(video.ContentDetails.Duration).TotalSeconds;
-            Log.Information($"Recovery complete : {video.Snippet.Title} saved to {video.Id}.mp3");
+            Logger.Log(Logger.Info, $"Recovery complete : {video.Snippet.Title} saved to {video.Id}.mp3");
             return new DownloadedVideo(video.Snippet.Title, duration, "https://www.youtube.com/watch?v=" + video.Id, video.Id, video.Id+".mp3" );
         }
 
@@ -101,7 +101,7 @@ namespace DiVA.Services.YouTube
                 Arguments = arguments
             };
 
-            Log.Information($"Starting youtube-dl with arguments: {youtubeDlStartupInfo.Arguments}", "Audio Download");
+            Logger.Log(Logger.Info, $"Starting youtube-dl with arguments: {youtubeDlStartupInfo.Arguments}", "Audio Download");
             return Process.Start(youtubeDlStartupInfo);
         }
     }

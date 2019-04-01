@@ -6,6 +6,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using System.Diagnostics;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace DiVA.Services
@@ -25,6 +26,8 @@ namespace DiVA.Services
         /// </summary>
         public IAudioClient Client { get; set; }
 
+        public AudioOutStream currentStream { get; set; }
+
         /// <summary>
         /// Queue of Iplayables
         /// </summary>
@@ -36,6 +39,11 @@ namespace DiVA.Services
         public float volume { get; set; }
 
         /// <summary>
+        /// FFMpeg process
+        /// </summary>
+        private Process _currentProcess;
+
+        /// <summary>
         /// Current song
         /// </summary>
         public  IPlayable NowPlaying { get; set; }
@@ -45,13 +53,14 @@ namespace DiVA.Services
         /// </summary>
         /// <param name="voiceChannel"></param>
         /// <param name="messageChannel"></param>
+        /// <param name="ConnectedChannels"></param>
         public async void ProcessQueue(IVoiceChannel voiceChannel, IMessageChannel messageChannel, ConcurrentDictionary<ulong, VoiceConnexion> ConnectedChannels)
         {
             using (var stream = Client.CreatePCMStream(AudioApplication.Music, bufferMillis: 2000))
             {
                 while (Queue.Count > 0)
                 {
-                    Log.Information("Waiting for songs", "Audio ProcessQueue");
+                    Logger.Log(Logger.Info, "Waiting for songs", "Audio ProcessQueue");
                     NowPlaying = Queue.FirstOrDefault();
                     try
                     {
@@ -61,31 +70,30 @@ namespace DiVA.Services
                         try
                         { await SendAsync(volume, NowPlaying.FullPath, stream); }
                         catch (OperationCanceledException)
-                        { Log.Verbose("Song have been skipped.", "Audio ProcessQueue"); }
+                        { Logger.Log(Logger.Verbose, "Song have been skipped.", "Audio ProcessQueue"); }
                         catch (InvalidOperationException)
-                        { Log.Verbose("Song have been skipped.", "Audio ProcessQueue"); }
+                        { Logger.Log(Logger.Verbose, "Song have been skipped.", "Audio ProcessQueue"); }
                         await Client.SetSpeakingAsync(false);
                         Queue.Remove(NowPlaying);
                         NowPlaying.OnPostPlay();
                         Thread.Sleep(1000);
                     }
                     catch (Exception e)
-                    { Log.Warning($"Error while playing song: {e}", "Audio ProcessQueue"); }
+                    { Logger.Log(Logger.Warning, $"Error while playing song: {e}", "Audio ProcessQueue"); }
                 }
             }
             await Channel.DisconnectAsync();
             ConnectedChannels.TryRemove(voiceChannel.Guild.Id, out VoiceConnexion tempVoice);
         }
 
-
-        private Process _currentProcess;
+        
 
         /// <summary>
         /// Voice sender
         /// </summary>
-        /// <param name="client"></param>
+        /// <param name="volume"></param>
         /// <param name="path"></param>
-        /// <param name="speedModifier"></param>
+        /// <param name="stream"></param>
         /// <returns></returns>
         public async Task SendAsync(float volume, string path, AudioOutStream stream)
         {
@@ -106,14 +114,43 @@ namespace DiVA.Services
             }
             await stream.FlushAsync();
         }
-
-
         /// <summary>
-        /// Setting volume for audio stream
+        /// 
         /// </summary>
-        /// <param name="audioSamples"></param>
-        /// <param name="volume"></param>
+        /// <param name="said">Text to say</param>
+        /// <param name="culture">Supported cultures are 'en-US' or 'fr-FR'</param>
         /// <returns></returns>
+        public async Task SayAsync(string said, string culture = "en-US")
+        {
+            var filename = $"TTS{DateTime.Now:HH-mm-ss-ffff}.wav";
+            var TTSHelper = new ProcessStartInfo
+            {
+                UseShellExecute        = false,
+                RedirectStandardOutput = false,
+                CreateNoWindow         = true,
+                FileName               = "TTSHelper.exe",
+                Arguments              = $"{Path.Combine(AppContext.BaseDirectory, "temp", filename)} {culture} {said}"
+            };
+
+            Logger.Log(Logger.Info, $"Starting tts helper with arguments: {TTSHelper.Arguments}", "Say TTS");
+            Process.Start(TTSHelper)?.WaitForExit();
+
+            var path = Path.Combine(AppContext.BaseDirectory, "temp", filename);
+
+            volume = 0.25f;
+            try
+            { await SendAsync(volume, path, currentStream); }
+            catch (OperationCanceledException)
+            { Logger.Log(Logger.Verbose, "Stopped speaking", "Say Audio"); }
+            catch (InvalidOperationException)
+            { Logger.Log(Logger.Verbose, "Stopped speaking.", "Say Audio"); }
+            await Client.SetSpeakingAsync(false);
+            try
+            { File.Delete(Path.Combine(AppContext.BaseDirectory, "temp", filename)); }
+            finally
+            { currentStream.FlushAsync(); }
+        }
+
         //TO DO make this work
         //public byte[] ScaleVolumeSafeAllocateBuffers(byte[] audioSamples, float volume)
         //{
@@ -152,7 +189,6 @@ namespace DiVA.Services
         /// Stream creator
         /// </summary>
         /// <param name="path"></param>
-        /// <param name="speedModifier"></param>
         /// <returns></returns>
         private static Process CreateStream(string path)
         {
@@ -165,7 +201,7 @@ namespace DiVA.Services
                 RedirectStandardOutput = true
             };
 
-            Log.Information($"Starting ffmpeg with args {ffmpeg.Arguments}", "Audio Create");
+            Logger.Log(Logger.Info, $"Starting ffmpeg with args {ffmpeg.Arguments}", "Audio Create");
             return Process.Start(ffmpeg);
         }
 
