@@ -1,20 +1,14 @@
-using NUnit.Framework;
-using Discord;
-using Moq;
-using Discord.Commands;
-using Discord.WebSocket;
 using System;
-using DiVA;
-using Microsoft.Extensions.DependencyInjection;
-using DiVA.Services.YouTube;
-using DiVA.Services;
-using System.Reflection;
-using System.Linq;
-using Microsoft.Extensions.Configuration;
-using System.Collections.Generic;
 using System.IO;
+using Discord;
+using Discord.Commands;
+using DiVA.Services;
+using DiVA.Services.YouTube;
+using Microsoft.Extensions.Configuration;
+using Moq;
+using NUnit.Framework;
 
-namespace Tests
+namespace DiVATests
 {
     [TestFixture, Category("MainTests")]
     public class Tests

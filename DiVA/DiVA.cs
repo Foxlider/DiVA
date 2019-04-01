@@ -231,7 +231,7 @@ namespace DiVA
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        private async Task UserJoinedGuildHandler(SocketGuildUser param)
+        private static async Task UserJoinedGuildHandler(SocketGuildUser param)
         {
             Random rnd = new Random();
             var channel = Client.GetChannel(param.Guild.DefaultChannel.Id) as SocketTextChannel;
@@ -243,7 +243,7 @@ namespace DiVA
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        private async Task UserLeftGuildHandler(SocketGuildUser param)
+        private static async Task UserLeftGuildHandler(SocketGuildUser param)
         {
             if (Client.GetChannel(param.Guild.DefaultChannel.Id) is SocketTextChannel channel)
             { await channel.SendMessageAsync($"{param.Nickname} ({param.Username}) left us... Say bye ! ");}
@@ -280,7 +280,7 @@ namespace DiVA
         /// Configuration generator
         /// </summary>
         /// <returns></returns>
-        public static bool TryGenerateConfiguration()
+        private static bool TryGenerateConfiguration()
         {
             var filePath = Path.Combine(AppContext.BaseDirectory, "config.json");
             if (File.Exists(filePath))
@@ -291,51 +291,19 @@ namespace DiVA
             return true;
         }
 
-        private void EditToken()
+        private static void EditToken()
         {
-            string url = "https://discordapp.com/developers/applications/538306821333712916/bots";
-            try
-            { Process.Start(url); }
-            catch
-            {
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                {
-                    url = url.Replace("&", "^&");
-                    Process.Start(new ProcessStartInfo("cmd", $"/c start {url}") { CreateNoWindow = true });
-                }
-                else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-                { Process.Start("xdg-open", url); }
-                else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-                { Process.Start("open", url); }
-                else
-                { throw; }
-            }
-
+            const string url = "https://discordapp.com/developers/applications/538306821333712916/bots";
+            BrowerLauncher(url);
             Logger.Log(Logger.Neutral, "Please enter the bot's token below.\n", "DiVA Login");
-            string answer = Console.ReadLine();
+            var answer = Console.ReadLine();
             Configuration["tokens:discord"] = answer;
             EditKey();
         }
-        private void EditKey()
+        private static void EditKey()
         {
-            string url = "https://console.developers.google.com/apis/credentials?project=diva-discord";
-            try
-            { Process.Start(url); }
-            catch
-            {
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                {
-                    url = url.Replace("&", "^&");
-                    Process.Start(new ProcessStartInfo("cmd", $"/c start {url}") { CreateNoWindow = true });
-                }
-                else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-                { Process.Start("xdg-open", url); }
-                else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-                { Process.Start("open", url); }
-                else
-                { throw; }
-            }
-
+            const string url = "https://console.developers.google.com/apis/credentials?project=diva-discord";
+            BrowerLauncher(url);
             Logger.Log(Logger.Neutral, "Please enter the DiVA API Key below.\n", "DiVA Login");
             string answer = Console.ReadLine();
             Configuration["tokens:youtube"] = answer;
@@ -346,11 +314,31 @@ namespace DiVA
             File.WriteAllText(filePath, json);
         }
 
-        private void CacheCleanup()
+        private static void BrowerLauncher(string url)
+        {
+            try
+            { Process.Start(url); }
+            catch
+            {
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    url = url.Replace("&", "^&");
+                    Process.Start(new ProcessStartInfo("cmd", $"/c start {url}") { CreateNoWindow = true });
+                }
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                { Process.Start("xdg-open", url); }
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                { Process.Start("open", url); }
+                else
+                { throw; }
+            }
+        }
+
+        private static void CacheCleanup()
         {
             try
             {
-                string cachePath = Path.Combine(AppContext.BaseDirectory, "Songs");
+                var cachePath = Path.Combine(AppContext.BaseDirectory, "Songs");
                 DirectoryInfo d = new DirectoryInfo(cachePath);
                 Logger.Log(Logger.Info, $"Searching for files in folder \n{cachePath}", "DiVA Login");
                 if (d.GetFiles().Length > 0)

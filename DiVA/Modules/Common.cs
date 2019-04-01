@@ -1,11 +1,4 @@
-﻿using Discord;
-using Discord.Commands;
-using Discord.WebSocket;
-using DiVA.Helpers;
-using DiVA.Services;
-using DiVA.Services.YouTube;
-using Microsoft.Extensions.Configuration;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -13,6 +6,13 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using Discord;
+using Discord.Commands;
+using Discord.WebSocket;
+using DiVA.Helpers;
+using DiVA.Services;
+using DiVA.Services.YouTube;
+using Microsoft.Extensions.Configuration;
 
 namespace DiVA.Modules
 {
@@ -371,7 +371,7 @@ namespace DiVA.Modules
             await ReplyAsync(answer);
             try
             { await Context.Message.DeleteAsync(); }
-            catch { }
+            catch { /* ignored*/ }
         }
 
         #endregion choose
@@ -386,42 +386,10 @@ namespace DiVA.Modules
         [Alias("r")]
         public async Task Roll(string dice)
         {
-            
+            await ReplyAsync(CommandHelper.DiceRoll(dice, Context.User.Mention));
             try
-            {
-                var result = dice
-                    .Split('d')
-                    .Select(input =>
-                    {
-                        int? output = null;
-                        if (int.TryParse(input, out var parsed))
-                        {
-                            output = parsed;
-                        }
-                        return output;
-                    })
-                    .Where(x => x != null)
-                    .Select(x => x.Value)
-                    .ToArray();
-                string msg = $"{Context.User.Mention} rolled {result[0]}d{result[1]}";
-                var range = Enumerable.Range(0, result[0]);
-                int[] dices = new int[result[0]];
-                Random _rnd = new Random();
-                foreach (var r in range)
-                { dices[r] = _rnd.Next(1, result[1]); }
-                msg += "\n [ **";
-                msg += string.Join("** | **", dices);
-                msg += "** ]";
-                await ReplyAsync(msg);
-            }
-            catch
-            { await ReplyAsync("C'est con mais j'ai pas compris..."); }
-            finally
-            {
-                try
-                { await Context.Message.DeleteAsync(); }
-                catch { /* ignored */ } 
-            }
+            { await Context.Message.DeleteAsync(); }
+            catch { /* ignored */ } 
         }
         #endregion roll
 
@@ -435,41 +403,10 @@ namespace DiVA.Modules
         [Alias("pvr")]
         public async Task PrivateRoll(string dice)
         {
+            await Context.User.SendMessageAsync(CommandHelper.DiceRoll(dice, Context.User.Mention));
             try
-            {
-                var result = dice
-                    .Split('d')
-                    .Select(input =>
-                    {
-                        int? output = null;
-                        if (int.TryParse(input, out var parsed))
-                        {
-                            output = parsed;
-                        }
-                        return output;
-                    })
-                    .Where(x => x != null)
-                    .Select(x => x.Value)
-                    .ToArray();
-                string msg = $"{Context.User.Mention} rolled {result[0]}d{result[1]}";
-                var range = Enumerable.Range(0, result[0]);
-                int[] dices = new int[result[0]];
-                Random _rnd = new Random();
-                foreach (var r in range)
-                { dices[r] = _rnd.Next(1, result[1]); }
-                msg += "\n [ **";
-                msg += string.Join("** | **", dices);
-                msg += "** ]";
-                await Context.User.SendMessageAsync(msg);
-            }
-            catch
-            { await Context.User.SendMessageAsync("C'est con mais j'ai pas compris..."); }
-            finally
-            {
-                try
-                { await Context.Message.DeleteAsync(); }
-                catch { /* ignored */ } 
-            }
+            { await Context.Message.DeleteAsync(); }
+            catch { /* ignored */ } 
         }
 
         #endregion roll
@@ -500,11 +437,10 @@ namespace DiVA.Modules
         /// <summary>
         /// Tests the console
         /// </summary>
-        /// <param name="stat"></param>
         /// <returns></returns>
-        [Command("consoletest")]
+        [Command("ctest")]
         [Summary("TestConsole")]
-        public async Task ConsoleTest(string stat = "")
+        public async Task ConsoleTest()
         {
             try
             { await Context.Message.DeleteAsync(); }
@@ -741,11 +677,144 @@ namespace DiVA.Modules
         }
         #endregion
 
-        #region clear
+        #region audiosay
         /// <summary>
-        /// CLEAR - Command Clear
+        /// AUDIOSAY - Say TTS things in vocal
         /// </summary>
+        /// <param name="said"></param>
         /// <returns></returns>
+        [Command("audiosay", RunMode = RunMode.Async)]
+        [Alias("asay")]
+        [Summary("Says something")]
+        public async Task AudioSay([Remainder, Summary("What should DiVA say")] string said)
+        {
+            try
+            { await Context.Message.DeleteAsync(); }
+            catch { /* ignored */ }
+
+            var voiceChannel = (Context.User as IGuildUser)?.VoiceChannel;
+            if (voiceChannel == null)
+            {
+                Logger.Log(Logger.Warning, "Error joining Voice Channel!", "Audio Stream");
+                await ReplyAsync($"I can't connect to your Voice Channel.");
+            }
+            else { SongService.Say(said, voiceChannel); }
+        }
+
+        /// <summary>
+        /// AUDIOSAYTO - Say TTS things to a specific channel
+        /// </summary>
+        /// <param name="channelId"></param>
+        /// <param name="said"></param>
+        /// <returns></returns>
+        [Command("audiosayto", RunMode = RunMode.Async)]
+        [Alias("asayto")]
+        [Summary("Says something")]
+        public async Task AudioSayTo(ulong channelId, [Remainder, Summary("What should DiVA say")] string said)
+        {
+            try
+            { await Context.Message.DeleteAsync(); }
+            catch { /* ignored */ }
+            var voiceChannel = await Context.Client.GetChannelAsync(channelId);
+            if (!(await Context.Client.GetChannelAsync(channelId) is IVoiceChannel))
+            {
+                Logger.Log(Logger.Warning, "Error joining Voice Channel!", "Audio Stream");
+                await ReplyAsync($"I can't connect to your Voice Channel.");
+            }
+            else { SongService.Say(said, voiceChannel as IVoiceChannel); }
+        }
+
+        /// <summary>
+        /// AUDIOSAY - Say TTS things in vocal
+        /// </summary>
+        /// <param name="culture"></param>
+        /// <param name="said"></param>
+        /// <returns></returns>
+        [Command("audiolsay", RunMode = RunMode.Async)]
+        [Alias("alsay")]
+        [Summary("Says something in the given language")]
+        public async Task AudioSayL([Summary("Language selected ('en-US'/'fr-FR'")] string culture, [Remainder, Summary("What should DiVA say")] string said)
+        {
+            try
+            { await Context.Message.DeleteAsync(); }
+            catch { /* ignored */ }
+
+            var voiceChannel = (Context.User as IGuildUser)?.VoiceChannel;
+            if (voiceChannel == null)
+            {
+                Logger.Log(Logger.Warning, "Error joining Voice Channel!", "Audio Stream");
+                await ReplyAsync($"I can't connect to your Voice Channel.");
+            }
+            else { SongService.Say(said, voiceChannel, culture); }
+        }
+
+        /// <summary>
+        /// AUDIOSAYTO - Say TTS things to a specific channel
+        /// </summary>
+        /// <param name="channelId"></param>
+        /// <param name="culture"></param>
+        /// <param name="said"></param>
+        /// <returns></returns>
+        [Command("audiolsayto", RunMode = RunMode.Async)]
+        [Alias("alsayto")]
+        [Summary("Says something in the given language")]
+        public async Task AudioSayToL(ulong channelId, [Summary("Language selected ('en-US'/'fr-FR'")]string culture, [Remainder, Summary("What should DiVA say")] string said)
+        {
+            try
+            { await Context.Message.DeleteAsync(); }
+            catch { /* ignored */ }
+            var voiceChannel = await Context.Client.GetChannelAsync(channelId);
+            if (!(await Context.Client.GetChannelAsync(channelId) is IVoiceChannel))
+            {
+                Logger.Log(Logger.Warning, "Error joining Voice Channel!", "Audio Stream");
+                await ReplyAsync($"I can't connect to your Voice Channel.");
+            }
+            else
+            { SongService.Say(said, voiceChannel as IVoiceChannel, culture); }
+        }
+        #endregion
+
+        #region disconnect
+        [Command("quit", RunMode = RunMode.Async)]
+        [Summary("Says something")]
+        public async Task DisconnectFrom(ulong channelId = 0)
+        {
+            try
+            { await Context.Message.DeleteAsync(); }
+            catch { /* ignored */ }
+            if (channelId == 0)
+            {
+                var voiceChannel = (Context.User as IGuildUser)?.VoiceChannel;
+                if (voiceChannel == null)
+                {
+                    Logger.Log(Logger.Warning, "Error joining Voice Channel!", "Audio Stream");
+                    await ReplyAsync($"I can't connect to your Voice Channel.");
+                }
+                await SongService.Quit(voiceChannel.Guild);
+            }
+            else
+            {
+                var voiceChannel = await Context.Client.GetChannelAsync(channelId);
+                if (!(await Context.Client.GetChannelAsync(channelId) is IVoiceChannel))
+                {
+                    Logger.Log(Logger.Warning, "Error joining Voice Channel!", "Audio Stream");
+                    await ReplyAsync($"I can't connect to your Voice Channel.");
+                }
+                else
+                {
+                    var temp = voiceChannel as IVoiceChannel;
+                    await SongService.Quit(temp.Guild);
+                }
+            }
+        }
+
+        #endregion
+
+            #region clear
+            /// <summary>
+            /// CLEAR - Command Clear
+            /// </summary>
+            /// <returns></returns>
         [Command("clear")]
         [Summary("Clears all songs in queue")]
         public async Task ClearQueue()
@@ -814,7 +883,7 @@ namespace DiVA.Modules
             await ReplyAsync($"Volume set to {volume}%", deleteafter: 5);
             try
             { await Context.Message.DeleteAsync(); }
-            catch { }
+            catch { /*ignored*/ }
         }
         #endregion
 
@@ -882,7 +951,7 @@ namespace DiVA.Modules
         /// CACHE LIST - List the cached music files
         /// </summary>
         /// <returns></returns>
-        [Command("cachelist"), Summary("Displays the list of cached videos")]
+        [Command("clist"), Summary("Displays the list of cached videos")]
         public async Task DisplayList()
         {
             try
@@ -930,7 +999,7 @@ namespace DiVA.Modules
         /// CACHE DELETE - Delete cached files
         /// </summary>
         /// <returns></returns>
-        [Command("cachedel"), Summary("Delete cache files")]
+        [Command("cdel"), Summary("Delete cache files")]
         public async Task Delete(string input=null)
         {
             string cachePath = Path.Combine(AppContext.BaseDirectory, "Songs");
@@ -975,7 +1044,7 @@ namespace DiVA.Modules
         {
             try
             { await Context.Message.DeleteAsync(); }
-            catch { }
+            catch { /*ignored*/ }
             if (log <= 5)
             {
                 DiVA.LogLvl = log;

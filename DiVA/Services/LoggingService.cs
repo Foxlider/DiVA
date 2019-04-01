@@ -4,7 +4,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using Discord;
-using DiVA;
 
 namespace DiVA.Services
 {
@@ -42,6 +41,13 @@ namespace DiVA.Services
         /// <summary>
         /// Constructor
         /// </summary>
+        /// <example>
+        /// private readonly IServiceProvider _services;
+        /// 
+        /// IServiceCollection serviceCollection = new ServiceCollection();
+        /// serviceCollection.AddSingleton(new Logger());
+        /// _services = serviceCollection.BuildServiceProvider();
+        /// </example>
         public Logger()
         {
             LogDirectory = Path.Combine(AppContext.BaseDirectory, "logs");

@@ -3,8 +3,7 @@ using Discord.Audio;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
+using System.Linq; 
 using System.Threading.Tasks;
 
 namespace DiVA.Services
@@ -26,12 +25,7 @@ namespace DiVA.Services
         /// </summary>
         public AudioService()
         { //Not used : _songQueue = new BufferBlock<IPlayable>(); 
-        }
-
-        /// <summary>
-        /// Playback service
-        /// </summary>
-        //public AudioPlaybackService AudioPlaybackService { get; set; }
+        } 
 
         /// <summary>
         /// NowPlaying var
@@ -51,15 +45,15 @@ namespace DiVA.Services
             finally
             { Logger.Log(Logger.Verbose, $"Stopped current audio stream for guild {voice.Channel.Guild.Name}", "Audio Quit"); }
             await voice.Channel.DisconnectAsync();
-            ConnectedChannels.TryRemove(voice.Channel.Guild.Id, out VoiceConnexion tempVoice);
+            ConnectedChannels.TryRemove(voice.Channel.Guild.Id, out VoiceConnexion _tempVoice);
         }
 
         /// <summary>
         /// Skips current song
         /// </summary>
-        public void Next(ulong Id)
+        public void Next(ulong id)
         {
-            ConnectedChannels.TryGetValue(Id, out VoiceConnexion voice);
+            ConnectedChannels.TryGetValue(id, out VoiceConnexion voice);
             voice.Queue.Remove(voice.Queue.FirstOrDefault());
             voice.StopCurrentOperation();
         }
@@ -130,7 +124,25 @@ namespace DiVA.Services
             return voice.Queue;
         }
 
-        
+        public async void Say(string said, IVoiceChannel voiceChannel, string culture = "en-US")
+        {
+            if (!ConnectedChannels.TryGetValue(voiceChannel.Guild.Id, out VoiceConnexion tempsVoice))
+            {
+                Logger.Log(Logger.Info, "Connecting to voice channel", "Audio Queue");
+                VoiceConnexion connexion = new VoiceConnexion
+                {
+                    Channel = voiceChannel,
+                    Queue   = new List<IPlayable>(),
+                    Client  = await voiceChannel.ConnectAsync()
+                };
+                connexion.currentStream = connexion.Client.CreatePCMStream(AudioApplication.Mixed);
+                tempsVoice = connexion;
+                if (ConnectedChannels.TryAdd(voiceChannel.Guild.Id, connexion))
+                { Logger.Log(Logger.Info, "Connected to voice", "Audio Queue"); }
+                Logger.Log(Logger.Verbose, $"Connected to {ConnectedChannels.Count} guilds", "Audio Queue");
+            }
+            await tempsVoice.SayAsync(said, culture);
+        }
 
         internal float SetVolume(ulong id, int? vol)
         {
