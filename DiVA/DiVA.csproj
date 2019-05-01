@@ -6,18 +6,18 @@
     <StartupObject>DiVA.DiVA</StartupObject>
     <ApplicationIcon />
     <Win32Resource />
-    <Version>1.8</Version>
+    <Version>1.9</Version>
     <Authors>Foxlider</Authors>
     <Company>FoxliCorp</Company>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <AssemblyName>DiVA</AssemblyName>
-    <AssemblyVersion>1.8.0.0</AssemblyVersion>
-    <FileVersion>1.7.0.0</FileVersion>
     <Description>DiVA is the bot written in C# to replace the actual Foxlibot.py.</Description>
     <Copyright>FoxliCorp</Copyright>
     <PackageProjectUrl>https://github.com/Foxlider/DiVA</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Foxlider/DiVA</RepositoryUrl>
-    <PackageReleaseNotes></PackageReleaseNotes>
+    <PackageReleaseNotes>Fixed : 
+ - Crash when logs were empty
+ - Audio files not downloading</PackageReleaseNotes>
     <Configurations>Debug;Release;DebugVerbose</Configurations>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
   </PropertyGroup>
@@ -40,14 +40,6 @@
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.2.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="System">
-      <HintPath>System</HintPath>
-      <Private>true</Private>
-      <Aliases>System</Aliases>
-    </Reference>
   </ItemGroup>
 
   <ItemGroup>
