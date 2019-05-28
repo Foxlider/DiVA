@@ -177,12 +177,6 @@
             <param name="stat"></param>
             <returns></returns>
         </member>
-        <member name="M:DiVA.Modules.Common.ConsoleTest">
-            <summary>
-            Tests the console
-            </summary>
-            <returns></returns>
-        </member>
         <member name="T:DiVA.Modules.Audio">
             <summary>
             Audio commands module
