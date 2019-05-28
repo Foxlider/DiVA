@@ -49,16 +49,23 @@ namespace TTS_Helper
             if (!Directory.Exists(Path.GetDirectoryName(path))) { Directory.CreateDirectory(Path.GetDirectoryName(path) ?? throw new InvalidOperationException("Output path cannot be empty")); }
             _synth.SetOutputToWaveFile(path);
             PromptBuilder builder = new PromptBuilder(new System.Globalization.CultureInfo(culture));
-            builder.StartSentence();
-            builder.AppendText( said);
-            builder.EndSentence();
+            builder.StartStyle(new PromptStyle(PromptRate.Medium));
+            builder.StartParagraph();
+            foreach (var sentence in said.Split('\n'))
+            {
+                builder.StartSentence();
+                builder.AppendText(sentence);
+                builder.EndSentence();
+            }
+            builder.EndParagraph();
+            builder.EndStyle();
 
             try
             { _synth.SelectVoice(GetVoice(culture)); }
             catch
             { throw new InvalidOperationException($"Could not select a voice with culture {culture}."); }
 
-            _synth.Speak(said);
+            _synth.Speak(builder);
         }
 
         private static string GetVoice(string culture)

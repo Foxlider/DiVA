@@ -120,7 +120,7 @@ namespace DiVA.Services
         {
             var bufferLen = Console.BufferWidth;
             var prefixLen = prefix.Length;
-            var lines = message.Split("\n");
+            var lines = message?.Split("\n");
             var result = new List<string>();
             foreach (var line in lines)
             {

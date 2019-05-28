@@ -6,23 +6,25 @@
     <StartupObject>DiVA.DiVA</StartupObject>
     <ApplicationIcon />
     <Win32Resource />
-    <Version>1.8</Version>
-    <Authors>Foxlider</Authors>
+    <Version>1.9.3</Version>
+    <Authors>Keelah</Authors>
     <Company>FoxliCorp</Company>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <AssemblyName>DiVA</AssemblyName>
-    <AssemblyVersion>1.8.0.0</AssemblyVersion>
-    <FileVersion>1.7.0.0</FileVersion>
     <Description>DiVA is the bot written in C# to replace the actual Foxlibot.py.</Description>
     <Copyright>FoxliCorp</Copyright>
     <PackageProjectUrl>https://github.com/Foxlider/DiVA</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Foxlider/DiVA</RepositoryUrl>
     <PackageReleaseNotes></PackageReleaseNotes>
-    <Configurations>Debug;Release;DebugVerbose</Configurations>
+    <Configurations>Debug;Release;DebugVerbose;DebugTTS</Configurations>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugTTS|AnyCPU'">
     <DefineConstants>DEBUG;TRACE</DefineConstants>
   </PropertyGroup>
 

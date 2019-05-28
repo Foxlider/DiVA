@@ -21,10 +21,13 @@ namespace DiVA.Services.YouTube
         /// <returns></returns>
         public async Task<DownloadedVideo> DownloadVideo(DownloadedVideo video)
         {
-            var outputPath = Path.Combine(AppContext.BaseDirectory, "Songs", video.DisplayID);
-            var youtubeDl = StartYoutubeDl(
-                $"-x -f bestaudio --audio-quality 0 --audio-format mp3 --add-metadata --print-json -o \"{outputPath}.%(ext)s\" {video.Url}");
-                //$"-o {outputPath} --restrict-filenames --extract-audio --no-overwrites --print-json --audio-format mp3 {video.Url}");
+            if (!Directory.Exists(Path.Combine(AppContext.BaseDirectory, "Songs")))
+            { Directory.CreateDirectory(Path.Combine(AppContext.BaseDirectory, "Songs")); }
+
+            var outputPath = Path.Combine(AppContext.BaseDirectory, "Songs", $"{video.DisplayID}.mp3");
+            //var youtubeDl = StartYoutubeDl($"-x -f bestaudio --audio-quality 0 --audio-format mp3 --add-metadata --print-json -o \"{outputPath}.%(ext)s\" {video.Url}");
+            var youtubeDl = StartYoutubeDl($"-x -f bestaudio --audio-quality 0 --audio-format mp3 -o \"{outputPath}\" --add-metadata --print-json  {video.Url}");
+            //$"-o {outputPath} --restrict-filenames --extract-audio --no-overwrites --print-json --audio-format mp3 {video.Url}");
 
             if (youtubeDl == null)
             {
@@ -35,7 +38,8 @@ namespace DiVA.Services.YouTube
             var jsonOutput = await youtubeDl.StandardOutput.ReadToEndAsync();
             youtubeDl.WaitForExit();
             Logger.Log(Logger.Info, $"Download completed with exit code {youtubeDl.ExitCode}", "Audio Download");
-
+            if (!File.Exists(Path.Combine(AppContext.BaseDirectory, "Songs", "songlist.cache")))
+            { File.Create(Path.Combine(AppContext.BaseDirectory, "Songs", "songlist.cache")); }
             File.AppendAllText(Path.Combine(AppContext.BaseDirectory, "Songs", "songlist.cache"), $"{video.Title},{video.DisplayID}.mp3;\n");
 
             return JsonConvert.DeserializeObject<DownloadedVideo>(jsonOutput);
@@ -102,6 +106,7 @@ namespace DiVA.Services.YouTube
             };
 
             Logger.Log(Logger.Info, $"Starting youtube-dl with arguments: {youtubeDlStartupInfo.Arguments}", "Audio Download");
+            Console.WriteLine(youtubeDlStartupInfo.Arguments);
             return Process.Start(youtubeDlStartupInfo);
         }
     }

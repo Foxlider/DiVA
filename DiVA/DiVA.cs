@@ -100,8 +100,12 @@ namespace DiVA
         /// <returns></returns>
         public async Task RunAsync()
         {
+            string version = $"{Assembly.GetExecutingAssembly().GetName().Name} v{GetVersion()}";
             Logger.Log(Logger.Neutral,
-                       $"Booting up...\n┌────────────┐\n│ {Assembly.GetExecutingAssembly().GetName().Name} v{GetVersion()} │\n└────────────┘\n", "DiVA start");
+                       $"Booting up...\n"
+                     + $"┌─{new string('─', version.Length )}─┐\n"
+                     + $"│ {version} │\n"
+                     + $"└─{new string('─', version.Length )}─┘\n", "DiVA start");
             Client = new DiscordSocketClient(new DiscordSocketConfig
             { LogLevel = LogSeverity.Debug });
             Client.Log += LogMessage;
@@ -156,7 +160,7 @@ namespace DiVA
             // Hook the MessageReceived Event into our Command Handler
             _commands.CommandExecuted += OnCommandExecuteAsync;
             Client.MessageReceived += HandleCommand;
-            
+
             Client.UserLeft += UserLeftGuildHandler;
             Client.UserJoined += UserJoinedGuildHandler;
         }
@@ -246,7 +250,7 @@ namespace DiVA
         private static async Task UserLeftGuildHandler(SocketGuildUser param)
         {
             if (Client.GetChannel(param.Guild.DefaultChannel.Id) is SocketTextChannel channel)
-            { await channel.SendMessageAsync($"{param.Nickname} ({param.Username}) left us... Say bye ! ");}
+            { await channel.SendMessageAsync($"{param.Nickname} ({param.Username}) left us... Say bye ! "); }
         }
 
         /// <summary>
@@ -381,12 +385,13 @@ namespace DiVA
         /// <returns></returns>
         public static string GetVersion()
         {
-        #if DEBUG
-            const string rev = "a";
-        #else
-            const string rev = "b";
-        #endif
-            return $"{Assembly.GetExecutingAssembly().GetName().Version.Major}.{Assembly.GetExecutingAssembly().GetName().Version.Minor}{rev}";
+            string rev = $"{(char)(Assembly.GetExecutingAssembly().GetName().Version.Build + 97)}";
+#if !DEBUG
+            rev += "-r";
+#endif
+            return $"{Assembly.GetExecutingAssembly().GetName().Version.Major}."
+                 + $"{Assembly.GetExecutingAssembly().GetName().Version.Minor}"
+                 + $"{rev}";
         }
 
     }

@@ -1,0 +1,701 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>DiVA</name>
+    </assembly>
+    <members>
+        <member name="M:DiVA.DiVA.RunAsync">
+            <summary>
+            Main Thread
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:DiVA.DiVA.InstallCommands">
+            <summary>
+            Install commands for the bot
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:DiVA.DiVA.ConfigureServices(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            Get services set up
+            </summary>
+            <param name="serviceCollection"></param>
+        </member>
+        <member name="M:DiVA.DiVA.OnCommandExecuteAsync(Discord.Optional{Discord.Commands.CommandInfo},Discord.Commands.ICommandContext,Discord.Commands.IResult)">
+            <summary>
+            Post-Command Handler
+            </summary>
+            <param name="command"></param>
+            <param name="context"></param>
+            <param name="result"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DiVA.DiVA.HandleCommand(Discord.WebSocket.SocketMessage)">
+            <summary>
+            Handle every Discord command
+            </summary>
+            <param name="messageParam"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DiVA.DiVA.UserJoinedGuildHandler(Discord.WebSocket.SocketGuildUser)">
+            <summary>
+            Handling user joining guild
+            </summary>
+            <param name="param"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DiVA.DiVA.UserLeftGuildHandler(Discord.WebSocket.SocketGuildUser)">
+            <summary>
+            Handling user leaving guild
+            </summary>
+            <param name="param"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DiVA.DiVA.CurrentDomain_ProcessExit(System.Object,System.EventArgs)">
+            <summary>
+            Shutdown procedure
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:DiVA.DiVA.LogMessage(Discord.LogMessage)">
+            <summary>
+            Log system
+            </summary>
+            <param name="message"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DiVA.DiVA.TryGenerateConfiguration">
+            <summary>
+            Configuration generator
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:DiVA.DiVA.SetDefaultStatus(Discord.WebSocket.DiscordSocketClient)">
+            <summary>
+            Setting current status
+            </summary>
+        </member>
+        <member name="M:DiVA.DiVA.GetVersion">
+            <summary>
+            Get current version
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:DiVA.Helpers.CommandHelper.SayHelloAsync(Discord.IMessageChannel,Discord.IDiscordClient,Discord.IUser,System.Random,System.Boolean)">
+            <summary>
+            Answers hello to user
+            </summary>
+            <param name="Channel"></param>
+            <param name="Client"></param>
+            <param name="User"></param>
+            <param name="_rnd"></param>
+            <param name="iAm"></param>
+            <returns></returns>
+        </member>
+        <member name="T:DiVA.Modules.Common">
+            <summary>
+            Common commands module
+            </summary>
+        </member>
+        <member name="M:DiVA.Modules.Common.ReplyAsync(System.String,System.Boolean,Discord.Embed,Discord.RequestOptions,System.Nullable{System.TimeSpan})">
+            <summary>
+            Override ReplyAsync
+            </summary>
+            <param name="message"></param>
+            <param name="isTTS"></param>
+            <param name="embed"></param>
+            <param name="options"></param>
+            <param name="deleteafter"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DiVA.Modules.Common.#ctor(Discord.Commands.CommandService)">
+            <summary>
+            Common Commands module builder
+            </summary>
+            <param name="service"></param>
+        </member>
+        <member name="M:DiVA.Modules.Common.Say(System.String)">
+            <summary>
+            SAY - Echos a message
+            </summary>
+            <param name="echo"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DiVA.Modules.Common.Hello">
+            <summary>
+            HELLO - Says hello
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:DiVA.Modules.Common.UserInfo(Discord.IUser)">
+            <summary>
+            USERINFO - Returns the information of a user
+            </summary>
+            <param name="user"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DiVA.Modules.Common.HelpAsync(System.String)">
+            <summary>
+            HELP - Displays some help
+            </summary>
+            <param name="command"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DiVA.Modules.Common.Version">
+            <summary>
+            VERSION - Command Version
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:DiVA.Modules.Common.Choose(System.String)">
+            <summary>
+            CHOOSE - Command choose
+            </summary>
+            <param name="cString">Multiple strings to choose from</param>
+            <returns></returns>
+        </member>
+        <member name="M:DiVA.Modules.Common.Roll(System.String)">
+            <summary>
+            ROLL - Command roll
+            </summary>
+            <param name="dice">string of the dices (ex. 1d10)</param>
+            <returns></returns>
+        </member>
+        <member name="M:DiVA.Modules.Common.PrivateRoll(System.String)">
+            <summary>
+            PVROLL - Command pvroll
+            </summary>
+            <param name="dice">string of the dices (ex. 1d10)</param>
+            <returns></returns>
+        </member>
+        <member name="M:DiVA.Modules.Common.Status(System.String)">
+            <summary>
+            STATUS - Command status
+            </summary>
+            <param name="stat"></param>
+            <returns></returns>
+        </member>
+        <member name="T:DiVA.Modules.Audio">
+            <summary>
+            Audio commands module
+            </summary>
+        </member>
+        <member name="P:DiVA.Modules.Audio.YoutubeDownloadService">
+            <summary>
+            Downloader from YouTube
+            </summary>
+        </member>
+        <member name="P:DiVA.Modules.Audio.SongService">
+            <summary>
+            Music handler
+            </summary>
+        </member>
+        <member name="M:DiVA.Modules.Audio.ReplyAsync(System.String,System.Boolean,Discord.Embed,Discord.RequestOptions,System.Nullable{System.Int32})">
+            <summary>
+            Override ReplyAsync
+            </summary>
+            <param name="message"></param>
+            <param name="isTTS"></param>
+            <param name="embed"></param>
+            <param name="options"></param>
+            <param name="deleteafter"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DiVA.Modules.Audio.Request(System.String)">
+            <summary>
+            PLAY - Function Play
+            </summary>
+            <param name="url"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DiVA.Modules.Audio.SoundTest">
+            <summary>
+            TEST - Sound test (watch your ears)
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:DiVA.Modules.Audio.Stream(System.String)">
+            <summary>
+            STREAM - Stream Player
+            </summary>
+            <param name="url"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DiVA.Modules.Audio.AudioSay(System.String)">
+            <summary>
+            AUDIOSAY - Say TTS things in vocal
+            </summary>
+            <param name="said"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DiVA.Modules.Audio.AudioSayTo(System.UInt64,System.String)">
+            <summary>
+            AUDIOSAYTO - Say TTS things to a specific channel
+            </summary>
+            <param name="channelId"></param>
+            <param name="said"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DiVA.Modules.Audio.AudioSayL(System.String,System.String)">
+            <summary>
+            AUDIOSAY - Say TTS things in vocal
+            </summary>
+            <param name="culture"></param>
+            <param name="said"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DiVA.Modules.Audio.AudioSayToL(System.UInt64,System.String,System.String)">
+            <summary>
+            AUDIOSAYTO - Say TTS things to a specific channel
+            </summary>
+            <param name="channelId"></param>
+            <param name="culture"></param>
+            <param name="said"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DiVA.Modules.Audio.ClearQueue">
+            <summary>
+            CLEAR - Command Clear
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:DiVA.Modules.Audio.Stop">
+            <summary>
+            STOP - Command stop
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:DiVA.Modules.Audio.SkipSong">
+            <summary>
+            SKIP - Command Skip
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:DiVA.Modules.Audio.Volume(System.Nullable{System.Int32})">
+            <summary>
+            VOLUME - Command volume
+            </summary>
+            <param name="vol"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DiVA.Modules.Audio.SongList">
+            <summary>
+            QUEUE - Command queue
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:DiVA.Modules.Audio.NowPlaying">
+            <summary>
+            NOWPLAYING - Command nowPlaying
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:DiVA.Modules.Admin">
+            <summary>
+            Cache handler group
+            </summary>
+        </member>
+        <member name="M:DiVA.Modules.Admin.DisplayList">
+            <summary>
+            CACHE LIST - List the cached music files
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:DiVA.Modules.Admin.Delete(System.String)">
+            <summary>
+            CACHE DELETE - Delete cached files
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:DiVA.Services.AudioService">
+            <summary>
+            Audio service
+            </summary>
+        </member>
+        <member name="F:DiVA.Services.AudioService.ConnectedChannels">
+            <summary>
+            List of VoiceChannels by server
+            </summary>
+        </member>
+        <member name="M:DiVA.Services.AudioService.#ctor">
+            <summary>
+            Service CTOR
+            </summary>
+        </member>
+        <member name="P:DiVA.Services.AudioService.NowPlaying">
+            <summary>
+            NowPlaying var
+            </summary>
+        </member>
+        <member name="M:DiVA.Services.AudioService.Quit(Discord.IGuild)">
+            <summary>
+            Quit the voice channel
+            </summary>
+            <param name="guild"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DiVA.Services.AudioService.Next(System.UInt64)">
+            <summary>
+            Skips current song
+            </summary>
+        </member>
+        <member name="M:DiVA.Services.AudioService.Clear(Discord.IGuild)">
+            <summary>
+            Clear queue
+            </summary>
+            <param name="guild"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DiVA.Services.AudioService.Queue(DiVA.Services.IPlayable,Discord.IVoiceChannel,Discord.IMessageChannel)">
+            <summary>
+            Add a song to the queue
+            </summary>
+            <param name="video"></param>
+            <param name="voiceChannel"></param>
+            <param name="messageChannel"></param>
+        </member>
+        <member name="M:DiVA.Services.AudioService.SongList(Discord.IGuild)">
+            <summary>
+            Lists current songs
+            </summary>
+            <param name="guild"></param>
+            <returns></returns>
+        </member>
+        <member name="T:DiVA.Services.IPlayable">
+            <summary>
+            Define a Playable Item. Can be either a Stream or a Video
+            </summary>
+        </member>
+        <member name="P:DiVA.Services.IPlayable.Url">
+            <summary>
+            URL of the item
+            </summary>
+        </member>
+        <member name="P:DiVA.Services.IPlayable.Uri">
+            <summary>
+            URI of the item
+            </summary>
+        </member>
+        <member name="P:DiVA.Services.IPlayable.Title">
+            <summary>
+            Title of the item
+            </summary>
+        </member>
+        <member name="P:DiVA.Services.IPlayable.Requester">
+            <summary>
+            Requester of the item
+            </summary>
+        </member>
+        <member name="P:DiVA.Services.IPlayable.DurationString">
+            <summary>
+            Duration of the item as a string
+            </summary>
+        </member>
+        <member name="P:DiVA.Services.IPlayable.FullPath">
+            <summary>
+            FullPath of file
+            </summary>
+        </member>
+        <member name="P:DiVA.Services.IPlayable.Speed">
+            <summary>
+            Speed of the item
+            </summary>
+        </member>
+        <member name="M:DiVA.Services.IPlayable.OnPostPlay">
+            <summary>
+            NOT IMPLEMENTED
+            </summary>
+        </member>
+        <member name="T:DiVA.Services.Logger">
+            <summary>
+            Logging service to handle Application-side logs
+            </summary>
+        </member>
+        <member name="M:DiVA.Services.Logger.#ctor">
+            <summary>
+            Constructor
+            </summary>
+            <example>
+            private readonly IServiceProvider _services;
+            
+            IServiceCollection serviceCollection = new ServiceCollection();
+            serviceCollection.AddSingleton(new Logger());
+            _services = serviceCollection.BuildServiceProvider();
+            </example>
+        </member>
+        <member name="M:DiVA.Services.Logger.Log(System.Int32,System.String,System.String)">
+            <summary>
+            Log message function handling Discord Logging
+            </summary>
+            <param name="severity">Message's severity</param>
+            <param name="message">Message's text</param>
+            <param name="source">Message's source</param>
+        </member>
+        <member name="M:DiVA.Services.Logger.LogToConsole(System.Int32,System.String,System.String)">
+            <summary>
+            Logging message to console
+            </summary>
+            <param name="severity">Severity level of the message</param>
+            <param name="message">Message sent</param>
+            <param name="source">Source of the message</param>
+        </member>
+        <member name="M:DiVA.Services.Logger.FormatDate">
+            <summary>
+            Simple date formatter
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:DiVA.Services.VoiceConnexion">
+            <summary>
+            Represents a connexion to a voicechannel of a server
+            </summary>
+        </member>
+        <member name="P:DiVA.Services.VoiceConnexion.Channel">
+            <summary>
+            Voice channel we are connected at
+            </summary>
+        </member>
+        <member name="P:DiVA.Services.VoiceConnexion.Client">
+            <summary>
+            Audio Client used by the channel
+            </summary>
+        </member>
+        <member name="P:DiVA.Services.VoiceConnexion.Queue">
+            <summary>
+            Queue of Iplayables
+            </summary>
+        </member>
+        <member name="P:DiVA.Services.VoiceConnexion.volume">
+            <summary>
+            Volume set for the client
+            </summary>
+        </member>
+        <member name="F:DiVA.Services.VoiceConnexion._currentProcess">
+            <summary>
+            FFMpeg process
+            </summary>
+        </member>
+        <member name="P:DiVA.Services.VoiceConnexion.NowPlaying">
+            <summary>
+            Current song
+            </summary>
+        </member>
+        <member name="M:DiVA.Services.VoiceConnexion.ProcessQueue(Discord.IVoiceChannel,Discord.IMessageChannel,System.Collections.Concurrent.ConcurrentDictionary{System.UInt64,DiVA.Services.VoiceConnexion})">
+            <summary>
+            Handled the Queue of a Voice Client
+            </summary>
+            <param name="voiceChannel"></param>
+            <param name="messageChannel"></param>
+            <param name="ConnectedChannels"></param>
+        </member>
+        <member name="M:DiVA.Services.VoiceConnexion.SendAsync(System.Single,System.String,Discord.Audio.AudioOutStream)">
+            <summary>
+            Voice sender
+            </summary>
+            <param name="volume"></param>
+            <param name="path"></param>
+            <param name="stream"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DiVA.Services.VoiceConnexion.SayAsync(System.String,System.String)">
+            <summary>
+            
+            </summary>
+            <param name="said">Text to say</param>
+            <param name="culture">Supported cultures are 'en-US' or 'fr-FR'</param>
+            <returns></returns>
+        </member>
+        <member name="M:DiVA.Services.VoiceConnexion.StopCurrentOperation">
+            <summary>
+            Skipper
+            </summary>
+        </member>
+        <member name="M:DiVA.Services.VoiceConnexion.CreateStream(System.String)">
+            <summary>
+            Stream creator
+            </summary>
+            <param name="path"></param>
+            <returns></returns>
+        </member>
+        <member name="T:DiVA.Services.YouTube.DownloadedVideo">
+            <summary>
+            Represents a downloaded video.
+            </summary>
+        </member>
+        <member name="M:DiVA.Services.YouTube.DownloadedVideo.#ctor(System.String,System.Int32,System.String,System.String,System.String)">
+            <summary>
+            Creates a Video
+            </summary>
+            <param name="title"></param>
+            <param name="duration"></param>
+            <param name="url"></param>
+            <param name="id"></param>
+            <param name="filename"></param>
+        </member>
+        <member name="P:DiVA.Services.YouTube.DownloadedVideo.Title">
+            <summary>
+            Title of the video
+            </summary>
+        </member>
+        <member name="P:DiVA.Services.YouTube.DownloadedVideo.Duration">
+            <summary>
+            Duration of the video in seconds.
+            </summary>
+        </member>
+        <member name="P:DiVA.Services.YouTube.DownloadedVideo.Url">
+            <summary>
+            The URL used to access the video site (note: not the actual video itself).
+            </summary>
+        </member>
+        <member name="P:DiVA.Services.YouTube.DownloadedVideo.DisplayID">
+            <summary>
+            Unique ID of the video, e.g. YouTube video ID.
+            </summary>
+        </member>
+        <member name="P:DiVA.Services.YouTube.DownloadedVideo.FileName">
+            <summary>
+            Name of the file it got stored on.
+            </summary>
+        </member>
+        <member name="P:DiVA.Services.YouTube.DownloadedVideo.Requester">
+            <summary>
+            Person requesting the download
+            </summary>
+        </member>
+        <member name="P:DiVA.Services.YouTube.DownloadedVideo.DurationString">
+            <summary>
+            Duration of the IPlayable Item
+            </summary>
+        </member>
+        <member name="P:DiVA.Services.YouTube.DownloadedVideo.Uri">
+            <summary>
+            Returns the Filename of a file
+            </summary>
+        </member>
+        <member name="P:DiVA.Services.YouTube.DownloadedVideo.FullPath">
+            <summary>
+            Returns the full path of file
+            </summary>
+        </member>
+        <member name="P:DiVA.Services.YouTube.DownloadedVideo.Speed">
+            <summary>
+            Speed modifier passed to ffmpeg (Frequency)
+            </summary>
+        </member>
+        <member name="M:DiVA.Services.YouTube.DownloadedVideo.OnPostPlay">
+            <summary>
+            After song Handler
+            </summary>
+        </member>
+        <member name="T:DiVA.Services.YouTube.StreamFormatMetadata">
+            <summary>
+            JSON metadata of a stream
+            </summary>
+        </member>
+        <member name="P:DiVA.Services.YouTube.StreamFormatMetadata.Format">
+            <summary>
+            Stream Format
+            </summary>
+        </member>
+        <member name="P:DiVA.Services.YouTube.StreamFormatMetadata.Url">
+            <summary>
+            Stream URL
+            </summary>
+        </member>
+        <member name="P:DiVA.Services.YouTube.StreamFormatMetadata.Codec">
+            <summary>
+            Stream audio codec
+            </summary>
+        </member>
+        <member name="T:DiVA.Services.YouTube.StreamMetadata">
+            <summary>
+            Metadata of a stream
+            </summary>
+        </member>
+        <member name="P:DiVA.Services.YouTube.StreamMetadata.Url">
+            <summary>
+            Stream URL
+            </summary>
+        </member>
+        <member name="P:DiVA.Services.YouTube.StreamMetadata.Uri">
+            <summary>
+            Stream URI
+            </summary>
+        </member>
+        <member name="P:DiVA.Services.YouTube.StreamMetadata.FullPath">
+            <summary>
+            Stream file full path
+            </summary>
+        </member>
+        <member name="P:DiVA.Services.YouTube.StreamMetadata.Requester">
+            <summary>
+            Stream requester
+            </summary>
+        </member>
+        <member name="P:DiVA.Services.YouTube.StreamMetadata.DurationString">
+            <summary>
+            Stream Duration
+            </summary>
+        </member>
+        <member name="P:DiVA.Services.YouTube.StreamMetadata.Speed">
+            <summary>
+            Stream speed
+            </summary>
+        </member>
+        <member name="P:DiVA.Services.YouTube.StreamMetadata.Title">
+            <summary>
+            Stream Title
+            </summary>
+        </member>
+        <member name="P:DiVA.Services.YouTube.StreamMetadata.ViewCount">
+            <summary>
+            Stream ViewCount
+            </summary>
+        </member>
+        <member name="P:DiVA.Services.YouTube.StreamMetadata.Formats">
+            <summary>
+            Stream formats
+            </summary>
+        </member>
+        <member name="M:DiVA.Services.YouTube.StreamMetadata.OnPostPlay">
+            <summary>
+            TO BE OVERRIDDEN
+            </summary>
+        </member>
+        <member name="T:DiVA.Services.YouTube.YouTubeDownloadService">
+            <summary>
+            Youtube Downloader
+            </summary>
+        </member>
+        <member name="M:DiVA.Services.YouTube.YouTubeDownloadService.DownloadVideo(DiVA.Services.YouTube.DownloadedVideo)">
+            <summary>
+            Donwload a video
+            </summary>
+            <param name="video"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DiVA.Services.YouTube.YouTubeDownloadService.GetLivestreamData(System.String)">
+            <summary>
+            Download a Livestream's data
+            </summary>
+            <param name="url"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DiVA.Services.YouTube.YouTubeDownloadService.GetVideoData(System.String)">
+            <summary>
+            Get a video's data
+            </summary>
+            <param name="search"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DiVA.Services.YouTube.YouTubeDownloadService.StartYoutubeDl(System.String)">
+            <summary>
+            Starting Youtube-DL process
+            </summary>
+            <param name="arguments"></param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>
