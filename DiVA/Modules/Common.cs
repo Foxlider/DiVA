@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -1071,6 +1073,54 @@ namespace DiVA.Modules
             }
             else
             { await Context.User.SendMessageAsync($"Please enter a value between 0 (Critical Messages) and 5(Debug messages)"); }
+        }
+        #endregion
+
+        #region settings
+        [Command("settings"), Summary("Edit guild's config")]
+        public async Task SetParam(string parameter = "", string value = "")
+        {
+            try
+            { await Context.Message.DeleteAsync(); }
+            catch { /*ignored*/ }
+            if(parameter == "")
+            {
+                var str = "No parameter sent. Please enter one of the following parameters :\n";
+                foreach (var method in typeof(GuildConfKeys).GetMethods().Where(m => m.IsStatic))
+                {
+                    if (method.IsStatic)
+                    {
+                        string name = method.Name.Replace("get_", "");
+                        var attr = GuildConfig.GetKeyType(name);
+                        str += $"`{name}{new string(' ', 25 - name.Length)} - {attr.Name}`\n";
+                    }
+                }
+                str += $"\nCurrent settings for **{Context.Guild.Name}** (`{Context.Guild.Id}`) : \n";
+                foreach (var line in GuildConfig.GetGuildSettings(DiVA.Client.GetGuild(Context.Guild.Id)))
+                { str += $"`{line.key}{new string(' ', 25 - line.key.Length)} - {line.value}`\n"; }
+                await Context.User.SendMessageAsync(str);
+            }
+            else
+            {
+                if (GuildConfKeys.Keys.FirstOrDefault(p => p.Item1.Value == parameter).Item1 != null)
+                {
+                    var converter = TypeDescriptor.GetConverter(GuildConfig.GetKeyType(parameter));
+
+                    if (converter != null && converter.IsValid(value))
+                    {
+                        var guild = DiVA.Client.GetGuild(Context.Guild.Id);
+                        GuildConfig.ChangeGuildSettings(guild, parameter, value);
+                        var str = "Guild settings updated.\n";
+                        foreach (var line in GuildConfig.GetGuildSettings(DiVA.Client.GetGuild(Context.Guild.Id)))
+                        { str += $"`{line.key}{new string(' ', 25 - line.key.Length)} - {line.value}`\n"; }
+                        await Context.User.SendMessageAsync(str);
+                    }
+                    else
+                    { await Context.User.SendMessageAsync("Impossible to update guild settings."); }
+                }
+                else
+                { await Context.User.SendMessageAsync("Invalid parameter key."); }
+            }
         }
         #endregion
 

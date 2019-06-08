@@ -122,27 +122,33 @@ namespace DiVA.Services
             var prefixLen = prefix.Length;
             var lines = message?.Split("\n");
             var result = new List<string>();
-            foreach (var line in lines)
+            if (lines != null)
             {
-                if (line.Length > bufferLen - prefixLen)
+                foreach (var line in lines)
                 {
-                    var s = prefix;
-                    var currLine = s;
-                    foreach (var word in line.Split(' '))
+                    if (line != null)
                     {
-                        if ($"{currLine} {word}".Length >= bufferLen)
+                        if (line.Length > bufferLen - prefixLen)
                         {
-                            s += $"\n{prefix}";
-                            currLine = prefix;
+                            var s = prefix;
+                            var currLine = s;
+                            foreach (var word in line.Split(' '))
+                            {
+                                if ($"{currLine} {word}".Length >= bufferLen)
+                                {
+                                    s += $"\n{prefix}";
+                                    currLine = prefix;
+                                }
+                                currLine += " " + word;
+                                s += " " + word;
+                            }
+                            result.Add(s.Split("\n")[0]);
+                            result.Add(s.Split("\n")[1]);
                         }
-                        currLine += " " + word;
-                        s += " " + word;
+                        else
+                        { result.Add($"{prefix} {line}"); }
                     }
-                    result.Add(s.Split("\n")[0]);
-                    result.Add(s.Split("\n")[1]);
                 }
-                else
-                { result.Add($"{prefix} {line}"); }
             }
             return result.ToArray();
         }

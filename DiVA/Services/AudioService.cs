@@ -135,7 +135,7 @@ namespace DiVA.Services
                     Queue   = new List<IPlayable>(),
                     Client  = await voiceChannel.ConnectAsync()
                 };
-                connexion.currentStream = connexion.Client.CreatePCMStream(AudioApplication.Mixed);
+                connexion.CurrentStream = connexion.Client.CreatePCMStream(AudioApplication.Mixed);
                 tempsVoice = connexion;
                 if (ConnectedChannels.TryAdd(voiceChannel.Guild.Id, connexion))
                 { Logger.Log(Logger.Info, "Connected to voice", "Audio Queue"); }
@@ -147,14 +147,14 @@ namespace DiVA.Services
         internal float SetVolume(ulong id, int? vol)
         {
             ConnectedChannels.TryGetValue(id, out VoiceConnexion voice);
-            voice.volume = (float)(vol/100.0);
-            return voice.volume;
+            voice.Volume = (float)(vol/100.0);
+            return voice.Volume;
         }
 
         internal object GetVolume(ulong id)
         {
             ConnectedChannels.TryGetValue(id, out VoiceConnexion voice);
-            return voice.volume;
+            return voice.Volume;
         }
     }
 

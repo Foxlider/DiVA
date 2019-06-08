@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using System;
+using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
@@ -49,9 +50,9 @@ namespace DiVA
             TryGenerateConfiguration();
             var builder = new ConfigurationBuilder()        // Create a new instance of the config builder
                 .SetBasePath(AppContext.BaseDirectory)      // Specify the default location for the config file
-                .AddJsonFile("config.json");        // Add this (json encoded) file to the configuration
+                .AddJsonFile("config.json");                // Add this (json encoded) file to the configuration
             Configuration = builder.Build();                // Build the configuration
-
+            
             IServiceCollection serviceCollection = new ServiceCollection();
             ConfigureServices(serviceCollection);
             _services = serviceCollection.BuildServiceProvider();
@@ -140,14 +141,22 @@ namespace DiVA
                 foreach (var guild in Client.Guilds)
                 {
                     Logger.Log(Logger.Neutral,
-                               $"  │┌───────────────\n  ││ {guild.Name} \n  ││ Owned by {guild.Owner.Nickname}#{guild.Owner.Discriminator}\n  ││ {guild.MemberCount} members\n  │└───────────────", "DiVA Login");
+                        $"  │┌───────────────\n" +
+                        $"  ││ {guild.Name} \n" +
+                        $"  ││ Owned by {guild.Owner.Nickname}#{guild.Owner.Discriminator}\n" +
+                        $"  ││ {guild.MemberCount} members\n" +
+                        $"  │└───────────────", "DiVA Login");
+                    GuildConfig.GenerateGuildSettings(guild);
                 }
                 Logger.Log(Logger.Neutral, "  └─", "DiVA Login");
+
                 Console.Title = $"{Assembly.GetExecutingAssembly().GetName().Name} v{GetVersion()}";
                 await SetDefaultStatus(Client);
             };
             await Task.Delay(-1);
         }
+
+        
 
         /// <summary>
         /// Install commands for the bot
@@ -238,8 +247,15 @@ namespace DiVA
         private static async Task UserJoinedGuildHandler(SocketGuildUser param)
         {
             Random rnd = new Random();
-            var channel = Client.GetChannel(param.Guild.DefaultChannel.Id) as SocketTextChannel;
-            await CommandHelper.SayHelloAsync(channel, Client, param, rnd);
+            var appSettings = ConfigurationManager.AppSettings;
+            if (appSettings[$"{param.Guild.Id}.UserJoinedAllowed"] == "true")
+            {
+                if (UInt64.TryParse(appSettings[$"{param.Guild.Id}.UserJoinedDefaultChannel"], out ulong chanID))
+                {
+                    var channel = Client.GetChannel(chanID) as SocketTextChannel;
+                    await CommandHelper.SayHelloAsync(channel, Client, param, rnd);
+                }
+            }
         }
 
         /// <summary>
@@ -249,8 +265,15 @@ namespace DiVA
         /// <returns></returns>
         private static async Task UserLeftGuildHandler(SocketGuildUser param)
         {
-            if (Client.GetChannel(param.Guild.DefaultChannel.Id) is SocketTextChannel channel)
-            { await channel.SendMessageAsync($"{param.Nickname} ({param.Username}) left us... Say bye ! "); }
+            var appSettings = ConfigurationManager.AppSettings;
+            if (appSettings[$"{param.Guild.Id}.UserJoinedAllowed"] == "true")
+            {
+                if (UInt64.TryParse(appSettings[$"{param.Guild.Id}.UserJoinedDefaultChannel"], out ulong chanID))
+                {
+                    var channel = Client.GetChannel(chanID) as SocketTextChannel;
+                    await channel.SendMessageAsync($"{param.Nickname} ({param.Username}) left us... Say bye ! ");
+                }
+            }
         }
 
         /// <summary>

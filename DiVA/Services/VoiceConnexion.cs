@@ -26,7 +26,7 @@ namespace DiVA.Services
         /// </summary>
         public IAudioClient Client { get; set; }
 
-        public AudioOutStream currentStream { get; set; }
+        public AudioOutStream CurrentStream { get; set; }
 
         /// <summary>
         /// Queue of Iplayables
@@ -36,7 +36,7 @@ namespace DiVA.Services
         /// <summary>
         /// Volume set for the client
         /// </summary>
-        public float volume { get; set; }
+        public float Volume { get; set; }
 
         /// <summary>
         /// FFMpeg process
@@ -66,9 +66,9 @@ namespace DiVA.Services
                     {
                         await messageChannel?.SendMessageAsync($"Now playing **{NowPlaying.Title}** | `{NowPlaying.DurationString}` | requested by {NowPlaying.Requester}");
                         await Client.SetSpeakingAsync(true);
-                        volume = 0.25f;
+                        Volume = 0.25f;
                         try
-                        { await SendAsync(volume, NowPlaying.FullPath, stream); }
+                        { await SendAsync(Volume, NowPlaying.FullPath, stream); }
                         catch (OperationCanceledException)
                         { Logger.Log(Logger.Verbose, "Song have been skipped.", "Audio ProcessQueue"); }
                         catch (InvalidOperationException)
@@ -137,9 +137,9 @@ namespace DiVA.Services
 
             var path = Path.Combine(AppContext.BaseDirectory, "temp", filename);
 
-            volume = 0.25f;
+            Volume = 0.25f;
             try
-            { await SendAsync(volume, path, currentStream); }
+            { await SendAsync(Volume, path, CurrentStream); }
             catch (OperationCanceledException)
             { Logger.Log(Logger.Verbose, "Stopped speaking", "Say Audio"); }
             catch (InvalidOperationException)
@@ -148,7 +148,7 @@ namespace DiVA.Services
             try
             { File.Delete(Path.Combine(AppContext.BaseDirectory, "temp", filename)); }
             finally
-            { currentStream.FlushAsync(); }
+            { CurrentStream.FlushAsync(); }
         }
 
         //TO DO make this work
