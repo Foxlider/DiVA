@@ -3,7 +3,6 @@ using Discord.Commands;
 using Discord.WebSocket;
 using DiVA.Helpers;
 using DiVA.Services;
-using DiVA.Services.YouTube;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
@@ -14,6 +13,7 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using DiVA.Services.Youtube;
 
 namespace DiVA
 {
@@ -38,7 +38,7 @@ namespace DiVA
             }
         }
 
-        public static async Task RunAsync(string[] args)
+        private static async Task RunAsync(string[] args)
         {
             AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
             var diVa = new DiVA(args);
@@ -81,17 +81,17 @@ namespace DiVA
         private void EchoHelp()
         {
             Logger.Log(Logger.Neutral, $" __[ DiVA v{GetVersion()} ]__" +
-                $"" +
-                $"Project Webpage: https://github.com/Foxlider/FoxliBot/tree/DiVA" +
-                $"" +
-                $"" +
-                $"Usage: ./DiVA [*parameters]" +
-                $"" +
-                $"Options" +
-                $"  -c --cache_cleanup          Delete the cache folder and its content." +
-                $"  -v --verbose                Display more information in the console for debug." +
-                $"  -h --help                   Print this message and exit" +
-                $"", "Help");
+                "" +
+                "Project Webpage: https://github.com/Foxlider/FoxliBot/tree/DiVA" +
+                "" +
+                "" +
+                "Usage: ./DiVA [*parameters]" +
+                "" +
+                "Options" +
+                "  -c --cache_cleanup          Delete the cache folder and its content." +
+                "  -v --verbose                Display more information in the console for debug." +
+                "  -h --help                   Print this message and exit" +
+                "", "Help");
             Environment.Exit(0);
         }
 
@@ -99,11 +99,11 @@ namespace DiVA
         /// Main Thread
         /// </summary>
         /// <returns></returns>
-        public async Task RunAsync()
+        private async Task RunAsync()
         {
             string version = $"{Assembly.GetExecutingAssembly().GetName().Name} v{GetVersion()}";
             Logger.Log(Logger.Neutral,
-                       $"Booting up...\n"
+                       "Booting up...\n"
                      + $"┌─{new string('─', version.Length )}─┐\n"
                      + $"│ {version} │\n"
                      + $"└─{new string('─', version.Length )}─┘\n", "DiVA start");
@@ -141,11 +141,11 @@ namespace DiVA
                 foreach (var guild in Client.Guilds)
                 {
                     Logger.Log(Logger.Neutral,
-                        $"  │┌───────────────\n" +
+                        "  │┌───────────────\n" +
                         $"  ││ {guild.Name} \n" +
                         $"  ││ Owned by {guild.Owner.Nickname}#{guild.Owner.Discriminator}\n" +
                         $"  ││ {guild.MemberCount} members\n" +
-                        $"  │└───────────────", "DiVA Login");
+                        "  │└───────────────", "DiVA Login");
                     GuildConfig.GenerateGuildSettings(guild);
                 }
                 Logger.Log(Logger.Neutral, "  └─", "DiVA Login");
@@ -162,7 +162,7 @@ namespace DiVA
         /// Install commands for the bot
         /// </summary>
         /// <returns></returns>
-        public async Task InstallCommands()
+        private async Task InstallCommands()
         {
             // Discover all of the commands in this assembly and load them.
             await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
@@ -270,8 +270,8 @@ namespace DiVA
             {
                 if (UInt64.TryParse(appSettings[$"{param.Guild.Id}.UserJoinedDefaultChannel"], out ulong chanID))
                 {
-                    var channel = Client.GetChannel(chanID) as SocketTextChannel;
-                    await channel.SendMessageAsync($"{param.Nickname} ({param.Username}) left us... Say bye ! ");
+                    if (Client.GetChannel(chanID) is SocketTextChannel channel)
+                        await channel.SendMessageAsync($"{param.Nickname} ({param.Username}) left us... Say bye ! ");
                 }
             }
         }
@@ -307,21 +307,22 @@ namespace DiVA
         /// Configuration generator
         /// </summary>
         /// <returns></returns>
-        private static bool TryGenerateConfiguration()
+        private static void TryGenerateConfiguration()
         {
             var filePath = Path.Combine(AppContext.BaseDirectory, "config.json");
             if (File.Exists(filePath))
-            { return false; }
+            {
+                return;
+            }
             object config = new DiVAConfiguration();
             var json = JsonConvert.SerializeObject(config, Formatting.Indented);
             File.WriteAllText(filePath, json);
-            return true;
         }
 
         private static void EditToken()
         {
             const string url = "https://discordapp.com/developers/applications/538306821333712916/bots";
-            BrowerLauncher(url);
+            BrowserLauncher(url);
             Logger.Log(Logger.Neutral, "Please enter the bot's token below.\n", "DiVA Login");
             var answer = Console.ReadLine();
             Configuration["tokens:discord"] = answer;
@@ -330,7 +331,7 @@ namespace DiVA
         private static void EditKey()
         {
             const string url = "https://console.developers.google.com/apis/credentials?project=diva-discord";
-            BrowerLauncher(url);
+            BrowserLauncher(url);
             Logger.Log(Logger.Neutral, "Please enter the DiVA API Key below.\n", "DiVA Login");
             string answer = Console.ReadLine();
             Configuration["tokens:youtube"] = answer;
@@ -341,7 +342,7 @@ namespace DiVA
             File.WriteAllText(filePath, json);
         }
 
-        private static void BrowerLauncher(string url)
+        private static void BrowserLauncher(string url)
         {
             try
             { Process.Start(url); }
@@ -391,7 +392,7 @@ namespace DiVA
                 { Logger.Log(Logger.Info, "No file found. Proceeding with launch...", "DiVA Login"); }
             }
             catch (DirectoryNotFoundException)
-            { Logger.Log(Logger.Info, $"No cache folder detected... Proceeding with launch...", "DiVA Login"); }
+            { Logger.Log(Logger.Info, "No cache folder detected... Proceeding with launch...", "DiVA Login"); }
             catch (Exception e)
             { Logger.Log(Logger.Error, $"An error occured. Please check and remove the cache manually : \n{e.Message}", "DiVA Login"); }
         }

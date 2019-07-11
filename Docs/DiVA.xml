@@ -83,6 +83,49 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:DiVA.GuildConfig.GenerateGuildSettings(Discord.WebSocket.SocketGuild)">
+            <summary>
+            Generate a guild's settings
+            </summary>
+            <param name="guild"></param>
+        </member>
+        <member name="M:DiVA.GuildConfig.ChangeGuildSettings(Discord.WebSocket.SocketGuild,System.String,System.String)">
+            <summary>
+            Edit a guild's config
+            </summary>
+            <param name="guild"></param>
+            <param name="key"></param>
+            <param name="value"></param>
+        </member>
+        <member name="M:DiVA.GuildConfig.ChangeGuildSettings(Discord.WebSocket.SocketGuild,DiVA.GuildConfKeys,System.String)">
+            <summary>
+            Edit a guild's setting
+            </summary>
+            <param name="guild"></param>
+            <param name="key"></param>
+            <param name="value"></param>
+        </member>
+        <member name="M:DiVA.GuildConfig.GetGuildSetting(Discord.WebSocket.SocketGuild,DiVA.GuildConfKeys)">
+            <summary>
+            Get a specific value from a guild's config
+            </summary>
+            <param name="guild">SocketGuild target</param>
+            <param name="key">GuildConfKeys key used</param>
+            <returns></returns>
+        </member>
+        <member name="M:DiVA.GuildConfig.GetGuildSetting(Discord.WebSocket.SocketGuild,System.String)">
+            <summary>
+            Get a specific value from a guild's config
+            </summary>
+            <param name="guild">SocketGuild target</param>
+            <param name="key">string key used</param>
+            <returns></returns>
+        </member>
+        <member name="T:DiVA.GuildConfKeys">
+            <summary>
+            Some kind of enum with strings
+            </summary>
+        </member>
         <member name="M:DiVA.Helpers.CommandHelper.SayHelloAsync(Discord.IMessageChannel,Discord.IDiscordClient,Discord.IUser,System.Random,System.Boolean)">
             <summary>
             Answers hello to user
@@ -467,7 +510,7 @@
             Queue of Iplayables
             </summary>
         </member>
-        <member name="P:DiVA.Services.VoiceConnexion.volume">
+        <member name="P:DiVA.Services.VoiceConnexion.Volume">
             <summary>
             Volume set for the client
             </summary>

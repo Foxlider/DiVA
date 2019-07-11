@@ -56,7 +56,7 @@ namespace DiVA.Services
         /// <param name="ConnectedChannels"></param>
         public async void ProcessQueue(IVoiceChannel voiceChannel, IMessageChannel messageChannel, ConcurrentDictionary<ulong, VoiceConnexion> ConnectedChannels)
         {
-            using (var stream = Client.CreatePCMStream(AudioApplication.Music, bufferMillis: 2000))
+            await using (var stream = Client.CreatePCMStream(AudioApplication.Music, bufferMillis: 2000))
             {
                 while (Queue.Count > 0)
                 {
@@ -182,7 +182,7 @@ namespace DiVA.Services
         public void StopCurrentOperation()
         {
             _currentProcess?.Close();
-            //We shound not need this if we dispose it _currentProcess?.Kill();
+            //We should not need this if we dispose it _currentProcess?.Kill();
             _currentProcess?.Dispose();
         }
 

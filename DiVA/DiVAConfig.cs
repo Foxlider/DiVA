@@ -2,10 +2,8 @@
 using DiVA.Services;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Configuration;
 using System.Linq;
-using System.Reflection;
 
 namespace DiVA
 {
@@ -31,7 +29,7 @@ namespace DiVA
         }
     }
 
-    public class GuildConfig
+    public static class GuildConfig
     {
         /// <summary>
         /// Generate a guild's settings
@@ -150,10 +148,10 @@ namespace DiVA
     {
         public static List<(GuildConfKeys, Type)> Keys = new List<(GuildConfKeys, Type)>
         {
-            (GuildConfKeys.UserJoinedAllowed, typeof(bool)),
-            (GuildConfKeys.UserJoinedDefaultChannel, typeof(ulong)),
-            (GuildConfKeys.UserLeftAllowed, typeof(bool)),
-            (GuildConfKeys.UserLeftDefaultChannel, typeof(ulong)),
+            (UserJoinedAllowed, typeof(bool)),
+            (UserJoinedDefaultChannel, typeof(ulong)),
+            (UserLeftAllowed, typeof(bool)),
+            (UserLeftDefaultChannel, typeof(ulong)),
         };
         private GuildConfKeys(string value) { Value = value; }
 
