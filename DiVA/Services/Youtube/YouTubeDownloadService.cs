@@ -38,10 +38,19 @@ namespace DiVA.Services.YouTube
             var jsonOutput = await youtubeDl.StandardOutput.ReadToEndAsync();
             youtubeDl.WaitForExit();
             Logger.Log(Logger.Info, $"Download completed with exit code {youtubeDl.ExitCode}", "Audio Download");
-            if (!File.Exists(Path.Combine(AppContext.BaseDirectory, "Songs", "songlist.cache")))
-            { File.Create(Path.Combine(AppContext.BaseDirectory, "Songs", "songlist.cache")); }
+            if (youtubeDl.ExitCode != 0 && jsonOutput == "")
+            {
+                var errStream = youtubeDl.StandardError;
+                if (errStream.BaseStream.CanSeek)
+                    errStream.BaseStream.Seek(0, SeekOrigin.Begin);
+                var err = await errStream.ReadToEndAsync();
+                Logger.Log(Logger.Warning, $"YoutubeDL Error : {err}");
+                return null;
+            }
+            //if (!File.Exists(Path.Combine(AppContext.BaseDirectory, "Songs", "songlist.cache")))
+            //{ File.Create(Path.Combine(AppContext.BaseDirectory, "Songs", "songlist.cache")); }
             File.AppendAllText(Path.Combine(AppContext.BaseDirectory, "Songs", "songlist.cache"), $"{video.Title},{video.DisplayID}.mp3;\n");
-
+            
             return JsonConvert.DeserializeObject<DownloadedVideo>(jsonOutput);
         }
 
@@ -100,6 +109,7 @@ namespace DiVA.Services.YouTube
             {
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
+                RedirectStandardError = true,
                 CreateNoWindow = true,
                 FileName = "youtube-dl",
                 Arguments = arguments
