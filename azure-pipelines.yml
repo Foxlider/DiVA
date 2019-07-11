@@ -1,0 +1,57 @@
+# ASP.NET Core
+# Build and test ASP.NET Core projects targeting .NET Core.
+# Add steps that run tests, create a NuGet package, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
+
+trigger:
+- master
+
+pool:
+  name: 'HomeServer'
+
+variables:
+  buildConfiguration: 'Release'
+
+steps:
+
+- task: UseDotNet@2
+  inputs:
+    packageType: 'sdk'
+    version: '3.0.x'
+    includePreviewVersions: true
+
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet Restore'
+  inputs:
+    command: 'restore'
+    projects: '**/*.sln'
+    feedsToUse: 'select'
+
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet Build $(buildConfiguration)'
+  inputs:
+    command: 'build'
+    projects: '**/*.sln'
+    arguments: '--configuration $(buildConfiguration)'
+  
+- script: dotnet build --configuration $(buildConfiguration)
+  displayName: 'dotnet build $(buildConfiguration)'
+
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet Publish $(buildConfiguration) x64'
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    projects: '**/Presentation.csproj'
+    arguments: '--configuration $(BuildConfiguration)  -r win-x64 --self-contained true /p:useapphost=true --output $(Build.ArtifactStagingDirectory)\Release_x64'
+
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet Publish $(buildConfiguration) x86'
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    projects: '**/Presentation.csproj'
+    arguments: '--configuration $(BuildConfiguration)  -r win-x86 --self-contained true /p:useapphost=true --output $(Build.ArtifactStagingDirectory)\Release_x86'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'publish artifacts'
