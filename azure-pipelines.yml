@@ -19,7 +19,6 @@ steps:
     packageType: 'sdk'
     version: '$(DotnetVersion)'
     includePreviewVersions: true
-    performMultiLevelLookup: true
 
 - task: DotNetCoreCLI@2
   displayName: 'dotnet Restore'
