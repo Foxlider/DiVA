@@ -54,8 +54,8 @@ namespace DiVA.Services
         public void Next(ulong id)
         {
             ConnectedChannels.TryGetValue(id, out VoiceConnexion voice);
-            voice.Queue.Remove(voice.Queue.FirstOrDefault());
-            voice.StopCurrentOperation();
+            voice?.Queue.Remove(voice.Queue.FirstOrDefault());
+            voice?.StopCurrentOperation();
         }
 
         /// <summary>

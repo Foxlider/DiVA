@@ -120,39 +120,33 @@ namespace DiVA.Services
         {
             var bufferLen = Console.BufferWidth;
             var prefixLen = prefix.Length;
-            var lines = message?.Split("\n");
-            var result = new List<string>();
+            var lines     = message?.Split("\n");
+            var result    = new List<string>();
             if (lines != null)
-            {
+            { 
                 foreach (var line in lines)
                 {
-                    if (line != null)
+                    if (line.Length > bufferLen - prefixLen)
                     {
-                        if (line.Length > bufferLen - prefixLen)
+                        var s        = prefix;
+                        var currLine = s;
+                        foreach (var word in line.Split(' '))
                         {
-                            var s = prefix;
-                            var currLine = s;
-                            foreach (var word in line.Split(' '))
+                            if ($"{currLine} {word}".Length >= bufferLen)
                             {
-                                if ($"{currLine} {word}".Length >= bufferLen)
-                                {
-                                    s += $"\n{prefix}";
-                                    currLine = prefix;
-                                }
-                                currLine += " " + word;
-                                s += " " + word;
+                                s        += $"\n{prefix}";
+                                currLine =  prefix;
                             }
-                            result.Add(s.Split("\n")[0]);
-                            result.Add(s.Split("\n")[1]);
+                            currLine += " " + word;
+                            s        += " " + word;
                         }
-                        else
-                        { result.Add($"{prefix} {line}"); }
+                        result.Add(s.Split("\n")[0]);
+                        result.Add(s.Split("\n")[1]);
                     }
+                    else { result.Add($"{prefix} {line}"); }
                 }
             }
             return result.ToArray();
         }
-
-        
     }
 }

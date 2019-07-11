@@ -615,14 +615,23 @@ namespace DiVA.Modules
                     }
                     catch
                     { /* ignored */ }
+                    if (video == null)
+                        throw new ArgumentNullException($"The video could not be downloaded. ");
                 }
                 Logger.Log(Logger.Verbose, $"Starting audio playback.", "Command Queue");
                 video.Requester = Context.User.Mention;
 
-                await ReplyAsync($"{Context.User.Mention} queued **{video.Title}** | `{TimeSpan.FromSeconds(video.Duration)}`", deleteafter: 20);
+                await ReplyAsync($"{Context.User.Mention} queued **{video?.Title}** | `{TimeSpan.FromSeconds(video.Duration)}`", deleteafter: 20);
                 SongService.Queue(video, _voiceChannel, Context.Message.Channel);
             }
-            catch (Exception e) { Logger.Log(Logger.Warning, $"Error while processing song requet: {e}", "Audio Request"); }
+            catch (Exception e)
+            {
+                Logger.Log(Logger.Warning, $"Error while processing song requet: {e}", "Audio Request");
+                try
+                { await ReplyAsync($"Error while processing song requet: {e.Message}", deleteafter: 20); }
+                catch
+                { /* ignored */}
+            }
             finally { typer?.Dispose(); }
         }
         #endregion
@@ -920,15 +929,16 @@ namespace DiVA.Modules
             { await ReplyAsync($"{Context.User.Mention} current queue is empty"); }
             else
             {
-                string msg = "";
-                var nowPlaying = songlist.FirstOrDefault();
-                var qList = songlist;
-                qList.Remove(nowPlaying);
+                string          msg        = "";
+                var             nowPlaying = songlist.FirstOrDefault();
+                List<IPlayable> qList      = songlist.TakeLast(songlist.Count - 1).ToList();
                 msg += $"** Now Playing : **\n  - *{nowPlaying.Title}* (`{nowPlaying.DurationString}`)\n\n";
                 if (qList.Count > 0)
-                { msg += "** Songs in queue : **"; }
-                foreach (var song in qList)
-                { msg += $"\n  - *{song.Title}* (`{song.DurationString}`)"; }
+                {
+                    msg        += "** Songs in queue : **"; 
+                    foreach (var song in qList)
+                    { msg += $"\n  - *{song.Title}* (`{song.DurationString}`)"; }
+                }
                 await ReplyAsync(msg);
             }
         }
