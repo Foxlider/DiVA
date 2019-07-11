@@ -120,29 +120,31 @@ namespace DiVA.Services
         {
             var bufferLen = Console.BufferWidth;
             var prefixLen = prefix.Length;
-            var lines = message?.Split("\n");
-            var result = new List<string>();
-            foreach (var line in lines)
-            {
-                if (line.Length > bufferLen - prefixLen)
+            var lines     = message?.Split("\n");
+            var result    = new List<string>();
+            if (lines != null)
+            { 
+                foreach (var line in lines)
                 {
-                    var s = prefix;
-                    var currLine = s;
-                    foreach (var word in line.Split(' '))
+                    if (line.Length > bufferLen - prefixLen)
                     {
-                        if ($"{currLine} {word}".Length >= bufferLen)
+                        var s        = prefix;
+                        var currLine = s;
+                        foreach (var word in line.Split(' '))
                         {
-                            s += $"\n{prefix}";
-                            currLine = prefix;
+                            if ($"{currLine} {word}".Length >= bufferLen)
+                            {
+                                s        += $"\n{prefix}";
+                                currLine =  prefix;
+                            }
+                            currLine += " " + word;
+                            s        += " " + word;
                         }
-                        currLine += " " + word;
-                        s += " " + word;
+                        result.Add(s.Split("\n")[0]);
+                        result.Add(s.Split("\n")[1]);
                     }
-                    result.Add(s.Split("\n")[0]);
-                    result.Add(s.Split("\n")[1]);
+                    else { result.Add($"{prefix} {line}"); }
                 }
-                else
-                { result.Add($"{prefix} {line}"); }
             }
             return result.ToArray();
         }

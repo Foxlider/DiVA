@@ -386,8 +386,8 @@ namespace DiVA
         public static string GetVersion()
         {
             string rev = $"{(char)(Assembly.GetExecutingAssembly().GetName().Version.Build + 97)}";
-#if !DEBUG
-            rev += "-r";
+#if DEBUG
+            rev += "-debug";
 #endif
             return $"{Assembly.GetExecutingAssembly().GetName().Version.Major}."
                  + $"{Assembly.GetExecutingAssembly().GetName().Version.Minor}"
