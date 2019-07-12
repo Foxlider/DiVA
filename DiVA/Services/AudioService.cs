@@ -20,12 +20,12 @@ namespace DiVA.Services
         /// </summary>
         public readonly ConcurrentDictionary<ulong, VoiceConnexion> ConnectedChannels = new ConcurrentDictionary<ulong, VoiceConnexion>();
 
-        /// <summary>
-        /// Service CTOR
-        /// </summary>
-        public AudioService()
-        { //Not used : _songQueue = new BufferBlock<IPlayable>(); 
-        } 
+        ///// <summary>
+        ///// Service CTOR
+        ///// </summary>
+        //public AudioService()
+        //{ //Not used : _songQueue = new BufferBlock<IPlayable>(); 
+        //} 
 
         /// <summary>
         /// NowPlaying var
@@ -88,27 +88,27 @@ namespace DiVA.Services
         /// <param name="messageChannel"></param>
         public async void Queue(IPlayable video, IVoiceChannel voiceChannel, IMessageChannel messageChannel)
         {
-            bool firstConnexion = false;
+            bool firstConnection = false;
             if (!ConnectedChannels.TryGetValue(voiceChannel.Guild.Id, out VoiceConnexion tempsVoice))
             {
                 Logger.Log(Logger.Info, "Connecting to voice channel", "Audio Queue");
-                VoiceConnexion connexion = new VoiceConnexion
+                VoiceConnexion connection = new VoiceConnexion
                 {
                     Channel = voiceChannel,
                     Queue = new List<IPlayable>(),
                     Client = await voiceChannel.ConnectAsync()
                 };
-                if (ConnectedChannels.TryAdd(voiceChannel.Guild.Id, connexion))
+                if (ConnectedChannels.TryAdd(voiceChannel.Guild.Id, connection))
                 { Logger.Log(Logger.Info, "Connected to voice", "Audio Queue"); }
                 Logger.Log(Logger.Verbose, $"Connected to {ConnectedChannels.Count} guilds", "Audio Queue");
-                firstConnexion = true;
+                firstConnection = true;
             }
             Logger.Log(Logger.Verbose, $"Added video : {video.Title} ({video.Uri})\n   to channel {voiceChannel.Guild.Name} :: {voiceChannel.Name}", "Audio Queue");
             ConnectedChannels.TryGetValue(voiceChannel.Guild.Id, out VoiceConnexion voice);
             lock(voice)
             { voice.Queue.Add(video); }
             
-            if (firstConnexion)
+            if (firstConnection)
             { voice.ProcessQueue(voiceChannel, messageChannel, ConnectedChannels); }
         }
 
@@ -129,15 +129,15 @@ namespace DiVA.Services
             if (!ConnectedChannels.TryGetValue(voiceChannel.Guild.Id, out VoiceConnexion tempsVoice))
             {
                 Logger.Log(Logger.Info, "Connecting to voice channel", "Audio Queue");
-                VoiceConnexion connexion = new VoiceConnexion
+                VoiceConnexion connection = new VoiceConnexion
                 {
                     Channel = voiceChannel,
                     Queue   = new List<IPlayable>(),
                     Client  = await voiceChannel.ConnectAsync()
                 };
-                connexion.currentStream = connexion.Client.CreatePCMStream(AudioApplication.Mixed);
-                tempsVoice = connexion;
-                if (ConnectedChannels.TryAdd(voiceChannel.Guild.Id, connexion))
+                connection.CurrentStream = connection.Client.CreatePCMStream(AudioApplication.Mixed);
+                tempsVoice = connection;
+                if (ConnectedChannels.TryAdd(voiceChannel.Guild.Id, connection))
                 { Logger.Log(Logger.Info, "Connected to voice", "Audio Queue"); }
                 Logger.Log(Logger.Verbose, $"Connected to {ConnectedChannels.Count} guilds", "Audio Queue");
             }
@@ -147,14 +147,14 @@ namespace DiVA.Services
         internal float SetVolume(ulong id, int? vol)
         {
             ConnectedChannels.TryGetValue(id, out VoiceConnexion voice);
-            voice.volume = (float)(vol/100.0);
-            return voice.volume;
+            voice.Volume = (float)(vol/100.0);
+            return voice.Volume;
         }
 
         internal object GetVolume(ulong id)
         {
             ConnectedChannels.TryGetValue(id, out VoiceConnexion voice);
-            return voice.volume;
+            return voice.Volume;
         }
     }
 
