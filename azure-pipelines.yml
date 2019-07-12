@@ -44,6 +44,15 @@ steps:
     projects: '**/DiVA.csproj'
     arguments: '--configuration $(BuildConfiguration)  -r win-x64 --self-contained true /p:useapphost=true --output $(Build.ArtifactStagingDirectory)\Release_x64'
 
+- task: ArchiveFiles@2
+  displayName: 'Archive x64'
+  inputs:
+    rootFolderOrFile: '$(Build.ArtifactStagingDirectory)\Release_x64'
+    includeRootFolder: true
+    archiveType: 'zip'
+    archiveFile: '$(Build.ArtifactStagingDirectory)\Release\DiVA_x64.zip'
+    replaceExistingArchive: true
+
 - task: DotNetCoreCLI@2
   displayName: 'dotnet - Publish $(buildConfiguration) x86'
   inputs:
@@ -52,5 +61,16 @@ steps:
     projects: '**/DiVA.csproj'
     arguments: '--configuration $(BuildConfiguration)  -r win-x86 --self-contained true /p:useapphost=true --output $(Build.ArtifactStagingDirectory)\Release_x86'
 
+- task: ArchiveFiles@2
+  displayName: 'Archive x64'
+  inputs:
+    rootFolderOrFile: '$(Build.ArtifactStagingDirectory)\Release_x64'
+    includeRootFolder: true
+    archiveType: 'zip'
+    archiveFile: '$(Build.ArtifactStagingDirectory)\Release\DiVA_x64.zip'
+    replaceExistingArchive: true
+
 - task: PublishBuildArtifacts@1
   displayName: 'publish artifacts'
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)\Release'
