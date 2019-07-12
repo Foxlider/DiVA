@@ -56,7 +56,7 @@ namespace DiVA.Services
         /// <param name="ConnectedChannels"></param>
         public async void ProcessQueue(IVoiceChannel voiceChannel, IMessageChannel messageChannel, ConcurrentDictionary<ulong, VoiceConnexion> ConnectedChannels)
         {
-            await using (var stream = Client.CreatePCMStream(AudioApplication.Music, bufferMillis: 2000))
+            using (var stream = Client.CreatePCMStream(AudioApplication.Music, bufferMillis: 2000))
             {
                 while (Queue.Count > 0)
                 {
