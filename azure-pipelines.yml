@@ -41,7 +41,7 @@ steps:
   inputs:
     command: 'publish'
     publishWebProjects: false
-    projects: '**/Presentation.csproj'
+    projects: '**/DiVA.csproj'
     arguments: '--configuration $(BuildConfiguration)  -r win-x64 --self-contained true /p:useapphost=true --output $(Build.ArtifactStagingDirectory)\Release_x64'
 
 - task: DotNetCoreCLI@2
@@ -49,7 +49,7 @@ steps:
   inputs:
     command: 'publish'
     publishWebProjects: false
-    projects: '**/Presentation.csproj'
+    projects: '**/DiVA.csproj'
     arguments: '--configuration $(BuildConfiguration)  -r win-x86 --self-contained true /p:useapphost=true --output $(Build.ArtifactStagingDirectory)\Release_x86'
 
 - task: PublishBuildArtifacts@1
