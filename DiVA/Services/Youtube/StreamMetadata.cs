@@ -1,9 +1,9 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
+using Newtonsoft.Json;
 
-namespace DiVA.Services.YouTube
+namespace DiVA.Services.Youtube
 {
     /// <summary>
     /// JSON metadata of a stream

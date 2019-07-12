@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DiVA.Helpers
 {
-    class CommandHelper
+    static class CommandHelper
     {
         /// <summary>
         /// Answers hello to user

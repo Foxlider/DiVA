@@ -3,7 +3,7 @@ using System.IO;
 using Discord;
 using Discord.Commands;
 using DiVA.Services;
-using DiVA.Services.YouTube;
+using DiVA.Services.Youtube;
 using Microsoft.Extensions.Configuration;
 using Moq;
 using NUnit.Framework;
