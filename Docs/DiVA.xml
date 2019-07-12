@@ -362,11 +362,6 @@
             List of VoiceChannels by server
             </summary>
         </member>
-        <member name="M:DiVA.Services.AudioService.#ctor">
-            <summary>
-            Service CTOR
-            </summary>
-        </member>
         <member name="P:DiVA.Services.AudioService.NowPlaying">
             <summary>
             NowPlaying var
@@ -562,12 +557,12 @@
             <param name="path"></param>
             <returns></returns>
         </member>
-        <member name="T:DiVA.Services.YouTube.DownloadedVideo">
+        <member name="T:DiVA.Services.Youtube.DownloadedVideo">
             <summary>
             Represents a downloaded video.
             </summary>
         </member>
-        <member name="M:DiVA.Services.YouTube.DownloadedVideo.#ctor(System.String,System.Int32,System.String,System.String,System.String)">
+        <member name="M:DiVA.Services.Youtube.DownloadedVideo.#ctor(System.String,System.Int32,System.String,System.String,System.String)">
             <summary>
             Creates a Video
             </summary>
@@ -577,163 +572,163 @@
             <param name="id"></param>
             <param name="filename"></param>
         </member>
-        <member name="P:DiVA.Services.YouTube.DownloadedVideo.Title">
+        <member name="P:DiVA.Services.Youtube.DownloadedVideo.Title">
             <summary>
             Title of the video
             </summary>
         </member>
-        <member name="P:DiVA.Services.YouTube.DownloadedVideo.Duration">
+        <member name="P:DiVA.Services.Youtube.DownloadedVideo.Duration">
             <summary>
             Duration of the video in seconds.
             </summary>
         </member>
-        <member name="P:DiVA.Services.YouTube.DownloadedVideo.Url">
+        <member name="P:DiVA.Services.Youtube.DownloadedVideo.Url">
             <summary>
             The URL used to access the video site (note: not the actual video itself).
             </summary>
         </member>
-        <member name="P:DiVA.Services.YouTube.DownloadedVideo.DisplayID">
+        <member name="P:DiVA.Services.Youtube.DownloadedVideo.DisplayID">
             <summary>
             Unique ID of the video, e.g. YouTube video ID.
             </summary>
         </member>
-        <member name="P:DiVA.Services.YouTube.DownloadedVideo.FileName">
+        <member name="P:DiVA.Services.Youtube.DownloadedVideo.FileName">
             <summary>
             Name of the file it got stored on.
             </summary>
         </member>
-        <member name="P:DiVA.Services.YouTube.DownloadedVideo.Requester">
+        <member name="P:DiVA.Services.Youtube.DownloadedVideo.Requester">
             <summary>
             Person requesting the download
             </summary>
         </member>
-        <member name="P:DiVA.Services.YouTube.DownloadedVideo.DurationString">
+        <member name="P:DiVA.Services.Youtube.DownloadedVideo.DurationString">
             <summary>
             Duration of the IPlayable Item
             </summary>
         </member>
-        <member name="P:DiVA.Services.YouTube.DownloadedVideo.Uri">
+        <member name="P:DiVA.Services.Youtube.DownloadedVideo.Uri">
             <summary>
             Returns the Filename of a file
             </summary>
         </member>
-        <member name="P:DiVA.Services.YouTube.DownloadedVideo.FullPath">
+        <member name="P:DiVA.Services.Youtube.DownloadedVideo.FullPath">
             <summary>
             Returns the full path of file
             </summary>
         </member>
-        <member name="P:DiVA.Services.YouTube.DownloadedVideo.Speed">
+        <member name="P:DiVA.Services.Youtube.DownloadedVideo.Speed">
             <summary>
             Speed modifier passed to ffmpeg (Frequency)
             </summary>
         </member>
-        <member name="M:DiVA.Services.YouTube.DownloadedVideo.OnPostPlay">
+        <member name="M:DiVA.Services.Youtube.DownloadedVideo.OnPostPlay">
             <summary>
             After song Handler
             </summary>
         </member>
-        <member name="T:DiVA.Services.YouTube.StreamFormatMetadata">
+        <member name="T:DiVA.Services.Youtube.StreamFormatMetadata">
             <summary>
             JSON metadata of a stream
             </summary>
         </member>
-        <member name="P:DiVA.Services.YouTube.StreamFormatMetadata.Format">
+        <member name="P:DiVA.Services.Youtube.StreamFormatMetadata.Format">
             <summary>
             Stream Format
             </summary>
         </member>
-        <member name="P:DiVA.Services.YouTube.StreamFormatMetadata.Url">
+        <member name="P:DiVA.Services.Youtube.StreamFormatMetadata.Url">
             <summary>
             Stream URL
             </summary>
         </member>
-        <member name="P:DiVA.Services.YouTube.StreamFormatMetadata.Codec">
+        <member name="P:DiVA.Services.Youtube.StreamFormatMetadata.Codec">
             <summary>
             Stream audio codec
             </summary>
         </member>
-        <member name="T:DiVA.Services.YouTube.StreamMetadata">
+        <member name="T:DiVA.Services.Youtube.StreamMetadata">
             <summary>
             Metadata of a stream
             </summary>
         </member>
-        <member name="P:DiVA.Services.YouTube.StreamMetadata.Url">
+        <member name="P:DiVA.Services.Youtube.StreamMetadata.Url">
             <summary>
             Stream URL
             </summary>
         </member>
-        <member name="P:DiVA.Services.YouTube.StreamMetadata.Uri">
+        <member name="P:DiVA.Services.Youtube.StreamMetadata.Uri">
             <summary>
             Stream URI
             </summary>
         </member>
-        <member name="P:DiVA.Services.YouTube.StreamMetadata.FullPath">
+        <member name="P:DiVA.Services.Youtube.StreamMetadata.FullPath">
             <summary>
             Stream file full path
             </summary>
         </member>
-        <member name="P:DiVA.Services.YouTube.StreamMetadata.Requester">
+        <member name="P:DiVA.Services.Youtube.StreamMetadata.Requester">
             <summary>
             Stream requester
             </summary>
         </member>
-        <member name="P:DiVA.Services.YouTube.StreamMetadata.DurationString">
+        <member name="P:DiVA.Services.Youtube.StreamMetadata.DurationString">
             <summary>
             Stream Duration
             </summary>
         </member>
-        <member name="P:DiVA.Services.YouTube.StreamMetadata.Speed">
+        <member name="P:DiVA.Services.Youtube.StreamMetadata.Speed">
             <summary>
             Stream speed
             </summary>
         </member>
-        <member name="P:DiVA.Services.YouTube.StreamMetadata.Title">
+        <member name="P:DiVA.Services.Youtube.StreamMetadata.Title">
             <summary>
             Stream Title
             </summary>
         </member>
-        <member name="P:DiVA.Services.YouTube.StreamMetadata.ViewCount">
+        <member name="P:DiVA.Services.Youtube.StreamMetadata.ViewCount">
             <summary>
             Stream ViewCount
             </summary>
         </member>
-        <member name="P:DiVA.Services.YouTube.StreamMetadata.Formats">
+        <member name="P:DiVA.Services.Youtube.StreamMetadata.Formats">
             <summary>
             Stream formats
             </summary>
         </member>
-        <member name="M:DiVA.Services.YouTube.StreamMetadata.OnPostPlay">
+        <member name="M:DiVA.Services.Youtube.StreamMetadata.OnPostPlay">
             <summary>
             TO BE OVERRIDDEN
             </summary>
         </member>
-        <member name="T:DiVA.Services.YouTube.YouTubeDownloadService">
+        <member name="T:DiVA.Services.Youtube.YouTubeDownloadService">
             <summary>
             Youtube Downloader
             </summary>
         </member>
-        <member name="M:DiVA.Services.YouTube.YouTubeDownloadService.DownloadVideo(DiVA.Services.YouTube.DownloadedVideo)">
+        <member name="M:DiVA.Services.Youtube.YouTubeDownloadService.DownloadVideo(DiVA.Services.Youtube.DownloadedVideo)">
             <summary>
             Donwload a video
             </summary>
             <param name="video"></param>
             <returns></returns>
         </member>
-        <member name="M:DiVA.Services.YouTube.YouTubeDownloadService.GetLivestreamData(System.String)">
+        <member name="M:DiVA.Services.Youtube.YouTubeDownloadService.GetLivestreamData(System.String)">
             <summary>
             Download a Livestream's data
             </summary>
             <param name="url"></param>
             <returns></returns>
         </member>
-        <member name="M:DiVA.Services.YouTube.YouTubeDownloadService.GetVideoData(System.String)">
+        <member name="M:DiVA.Services.Youtube.YouTubeDownloadService.GetVideoData(System.String)">
             <summary>
             Get a video's data
             </summary>
             <param name="search"></param>
             <returns></returns>
         </member>
-        <member name="M:DiVA.Services.YouTube.YouTubeDownloadService.StartYoutubeDl(System.String)">
+        <member name="M:DiVA.Services.Youtube.YouTubeDownloadService.StartYoutubeDl(System.String)">
             <summary>
             Starting Youtube-DL process
             </summary>

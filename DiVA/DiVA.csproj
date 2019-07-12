@@ -18,6 +18,7 @@
     <PackageReleaseNotes></PackageReleaseNotes>
     <Configurations>Debug;Release;DebugVerbose;DebugTTS</Configurations>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
