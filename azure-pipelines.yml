@@ -14,12 +14,13 @@ variables:
 
 steps:
 
-- task: UseDotNet@2
-  inputs:
-    packageType: 'sdk'
-    version: '$(DotnetVersion)'
-    includePreviewVersions: true
-    performMultiLevelLookup: true
+#Wait for the Azure team to fix this
+# - task: UseDotNet@2
+#   inputs:
+#     packageType: 'sdk'
+#     version: '$(DotnetVersion)'
+#     includePreviewVersions: true
+#     performMultiLevelLookup: true
 
 - task: DotNetCoreCLI@2
   displayName: 'dotnet Restore'
