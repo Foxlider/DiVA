@@ -14,32 +14,30 @@ variables:
 
 steps:
 
-- task: UseDotNet@2
-  inputs:
-    packageType: 'sdk'
-    version: '$(DotnetVersion)'
-    includePreviewVersions: true
-    performMultiLevelLookup: true
+#Wait for the Azure team to fix this
+# - task: UseDotNet@2
+#   inputs:
+#     packageType: 'sdk'
+#     version: '$(DotnetVersion)'
+#     includePreviewVersions: true
+#     performMultiLevelLookup: true
 
 - task: DotNetCoreCLI@2
-  displayName: 'dotnet Restore'
+  displayName: 'dotnet - Restore'
   inputs:
     command: 'restore'
     projects: '**/*.sln'
     feedsToUse: 'select'
 
 - task: DotNetCoreCLI@2
-  displayName: 'dotnet Build $(buildConfiguration)'
+  displayName: 'dotnet - Build $(buildConfiguration)'
   inputs:
     command: 'build'
     projects: '**/*.sln'
     arguments: '--configuration $(buildConfiguration)'
   
-- script: dotnet build --configuration $(buildConfiguration)
-  displayName: 'dotnet build $(buildConfiguration)'
-
 - task: DotNetCoreCLI@2
-  displayName: 'dotnet Publish $(buildConfiguration) x64'
+  displayName: 'dotnet - Publish $(buildConfiguration) x64'
   inputs:
     command: 'publish'
     publishWebProjects: false
@@ -47,7 +45,7 @@ steps:
     arguments: '--configuration $(BuildConfiguration)  -r win-x64 --self-contained true /p:useapphost=true --output $(Build.ArtifactStagingDirectory)\Release_x64'
 
 - task: DotNetCoreCLI@2
-  displayName: 'dotnet Publish $(buildConfiguration) x86'
+  displayName: 'dotnet - Publish $(buildConfiguration) x86'
   inputs:
     command: 'publish'
     publishWebProjects: false
