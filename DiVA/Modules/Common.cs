@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -11,7 +12,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 using DiVA.Helpers;
 using DiVA.Services;
-using DiVA.Services.YouTube;
+using DiVA.Services.Youtube;
 using Microsoft.Extensions.Configuration;
 
 namespace DiVA.Modules
@@ -143,7 +144,7 @@ namespace DiVA.Modules
             var builder = new EmbedBuilder();
             EmbedFieldBuilder field;
 
-            builder.WithTitle($"User Informations");
+            builder.WithTitle("User Informations");
             builder.WithDescription($"Informations of {userInfo.Mention} - {userInfo.Username}#{userInfo.Discriminator}");
 
             if (userInfo.IsBot)
@@ -166,8 +167,7 @@ namespace DiVA.Modules
             builder.AddField(field);
 
 
-            var guildUser = (userInfo as IGuildUser);
-            if (guildUser != null)
+            if (userInfo is IGuildUser guildUser)
             {
                 if (guildUser.JoinedAt != null) field = new EmbedFieldBuilder { IsInline = true, Name = "User joined at ", Value = guildUser.JoinedAt.Value.DateTime.ToString("g", CultureInfo.CreateSpecificCulture("fr-FR")) };
                 builder.AddField(field);
@@ -307,7 +307,7 @@ namespace DiVA.Modules
 
             var builder = new EmbedBuilder();
 
-            builder.WithTitle($"Bot Informations");
+            builder.WithTitle("Bot Informations");
             builder.WithDescription($"{_client.CurrentUser.Mention} - {_client.CurrentUser.Username}#{_client.CurrentUser.Discriminator}");
 
             EmbedFieldBuilder field = new EmbedFieldBuilder
@@ -425,7 +425,7 @@ namespace DiVA.Modules
             try
             { await Context.Message.DeleteAsync(); }
             catch { /* ignored */ }
-            if (stat == null || stat == "")
+            if (string.IsNullOrEmpty(stat))
             { await DiVA.SetDefaultStatus(_client); }
             else
             { await _client.SetGameAsync(stat, type: ActivityType.Watching); }
@@ -472,7 +472,7 @@ namespace DiVA.Modules
         {
             await Context.Channel.TriggerTypingAsync();
             //Hi @Darlon !
-            await ReplyAsync($"Pong!");
+            await ReplyAsync("Pong!");
         }
         #endregion
 
@@ -506,18 +506,19 @@ namespace DiVA.Modules
             }
             await Task.Delay(duration).ConfigureAwait(false);
 
-            var finalMessage = await Context.Channel.GetMessageAsync(msg.Id) as IUserMessage;
+            if (await Context.Channel.GetMessageAsync(msg.Id) is IUserMessage finalMessage)
+            {
+                var resEmote = finalMessage.Reactions.Where(xkvp => emoteList.Contains(xkvp.Key))
+                    .Select(xkvp => $"{xkvp.Key}: {xkvp.Value.ReactionCount}");
 
-            var resEmote = finalMessage.Reactions.Where(xkvp => emoteList.Contains(xkvp.Key))
-                .Select(xkvp => $"{xkvp.Key}: {xkvp.Value.ReactionCount}");
+                var resEmoji = finalMessage.Reactions.Where(xkvp => emojiList.Contains(xkvp.Key))
+                    .Select(xkvp => $"{xkvp.Key}: {xkvp.Value.ReactionCount}");
 
-            var resEmoji = finalMessage.Reactions.Where(xkvp => emojiList.Contains(xkvp.Key))
-                .Select(xkvp => $"{xkvp.Key}: {xkvp.Value.ReactionCount}");
+                var results = resEmoji.Union(resEmote).ToList();
 
-            var results = resEmoji.Union(resEmote).ToList();
-
-            // and finally post the results
-            await ReplyAsync($"Results : \n{string.Join("\n", results)}");
+                // and finally post the results
+                await ReplyAsync($"Results : \n{string.Join("\n", results)}");
+            }
         }
         #endregion
 
@@ -586,7 +587,7 @@ namespace DiVA.Modules
                 if (_voiceChannel == null)
                 {
                     Logger.Log(Logger.Warning, "Error joining Voice Channel!", "Audio Request");
-                    await ReplyAsync($"I can't connect to your Voice Channel.", deleteafter: 10);
+                    await ReplyAsync("I can't connect to your Voice Channel.", deleteafter: 10);
                     return;
                 }
                 typer = Context.Channel.EnterTypingState();
@@ -597,12 +598,12 @@ namespace DiVA.Modules
                     return;
                 }
 
-                Logger.Log(Logger.Verbose, $"Got video informations from YouTube API\n" +
+                Logger.Log(Logger.Verbose, "Got video informations from YouTube API\n" +
                                            $"{url} :: {video.Title} ({video.Uri})", "Command Queue");
 
                 if (!File.Exists(Path.Combine("Songs", $"{video.DisplayID}.mp3")))
                 {
-                    Logger.Log(Logger.Verbose, $"Audio not in cache folder. Starting download...", "Command Queue");
+                    Logger.Log(Logger.Verbose, "Audio not in cache folder. Starting download...", "Command Queue");
                     var downloadAnnouncement = await ReplyAsync($"{Context.User.Mention} attempting to download {url}");
                     await Context.Channel.TriggerTypingAsync();
                     video = await YoutubeDownloadService.DownloadVideo(video);
@@ -614,19 +615,19 @@ namespace DiVA.Modules
                     catch
                     { /* ignored */ }
                     if (video == null)
-                        throw new ArgumentNullException($"The video could not be downloaded. ");
+                        throw new NullReferenceException("The video could not be downloaded.");
                 }
-                Logger.Log(Logger.Verbose, $"Starting audio playback.", "Command Queue");
+                Logger.Log(Logger.Verbose, "Starting audio playback.", "Command Queue");
                 video.Requester = Context.User.Mention;
 
-                await ReplyAsync($"{Context.User.Mention} queued **{video?.Title}** | `{TimeSpan.FromSeconds(video.Duration)}`", deleteafter: 20);
+                await ReplyAsync($"{Context.User.Mention} queued **{video.Title}** | `{TimeSpan.FromSeconds(video.Duration)}`", deleteafter: 20);
                 SongService.Queue(video, _voiceChannel, Context.Message.Channel);
             }
             catch (Exception e)
             {
-                Logger.Log(Logger.Warning, $"Error while processing song requet: {e}", "Audio Request");
+                Logger.Log(Logger.Warning, $"Error while processing song request: {e}", "Audio Request");
                 try
-                { await ReplyAsync($"Error while processing song requet: {e.Message}", deleteafter: 20); }
+                { await ReplyAsync($"Error while processing song request: {e.Message}", deleteafter: 20); }
                 catch
                 { /* ignored */}
             }
@@ -686,13 +687,13 @@ namespace DiVA.Modules
                 if (_voiceChannel == null)
                 {
                     Logger.Log(Logger.Warning, "Error joining Voice Channel!", "Audio Stream");
-                    await ReplyAsync($"I can't connect to your Voice Channel.");
+                    await ReplyAsync("I can't connect to your Voice Channel.");
                 }
                 else
                 { SongService.Queue(stream, _voiceChannel, Context.Message.Channel); }
             }
             catch (Exception e)
-            { Logger.Log(Logger.Warning, $"Error while processing song requet: {e}", "Audio Stream"); }
+            { Logger.Log(Logger.Warning, $"Error while processing song request: {e}", "Audio Stream"); }
         }
         #endregion
 
@@ -715,7 +716,7 @@ namespace DiVA.Modules
             if (voiceChannel == null)
             {
                 Logger.Log(Logger.Warning, "Error joining Voice Channel!", "Audio Stream");
-                await ReplyAsync($"I can't connect to your Voice Channel.");
+                await ReplyAsync("I can't connect to your Voice Channel.");
             }
             else { SongService.Say(said, voiceChannel); }
         }
@@ -738,7 +739,7 @@ namespace DiVA.Modules
             if (!(await Context.Client.GetChannelAsync(channelId) is IVoiceChannel))
             {
                 Logger.Log(Logger.Warning, "Error joining Voice Channel!", "Audio Stream");
-                await ReplyAsync($"I can't connect to your Voice Channel.");
+                await ReplyAsync("I can't connect to your Voice Channel.");
             }
             else { SongService.Say(said, voiceChannel as IVoiceChannel); }
         }
@@ -762,7 +763,7 @@ namespace DiVA.Modules
             if (voiceChannel == null)
             {
                 Logger.Log(Logger.Warning, "Error joining Voice Channel!", "Audio Stream");
-                await ReplyAsync($"I can't connect to your Voice Channel.");
+                await ReplyAsync("I can't connect to your Voice Channel.");
             }
             else { SongService.Say(said, voiceChannel, culture); }
         }
@@ -786,7 +787,7 @@ namespace DiVA.Modules
             if (!(await Context.Client.GetChannelAsync(channelId) is IVoiceChannel))
             {
                 Logger.Log(Logger.Warning, "Error joining Voice Channel!", "Audio Stream");
-                await ReplyAsync($"I can't connect to your Voice Channel.");
+                await ReplyAsync("I can't connect to your Voice Channel.");
             }
             else
             { SongService.Say(said, voiceChannel as IVoiceChannel, culture); }
@@ -807,7 +808,7 @@ namespace DiVA.Modules
                 if (voiceChannel == null)
                 {
                     Logger.Log(Logger.Warning, "Error getting Voice Channel!", "Audio Stream");
-                    await ReplyAsync($"I can't get your Voice Channel.");
+                    await ReplyAsync("I can't get your Voice Channel.");
                 }
                 await SongService.Quit(voiceChannel.Guild);
             }
@@ -817,7 +818,7 @@ namespace DiVA.Modules
                 if (!(await Context.Client.GetChannelAsync(channelId) is IVoiceChannel))
                 {
                     Logger.Log(Logger.Warning, "Error joining Voice Channel!", "Audio Stream");
-                    await ReplyAsync($"I can't connect to your Voice Channel.");
+                    await ReplyAsync("I can't connect to your Voice Channel.");
                 }
                 else
                 {
@@ -989,8 +990,8 @@ namespace DiVA.Modules
                 if (File.Exists(Path.Combine(cachePath, "songlist.cache")))
                 {
                     var builder = new EmbedBuilder();
-                    builder.WithTitle($"**Cached song list**");
-                    builder.WithDescription($"List of songs downloaded\n");
+                    builder.WithTitle("**Cached song list**");
+                    builder.WithDescription("List of songs downloaded\n");
                     foreach (var line in File.ReadAllLines(Path.Combine(cachePath, "songlist.cache")))
                     {
                         var filename = line.Split(",").Last().Trim(';');
@@ -1080,7 +1081,55 @@ namespace DiVA.Modules
                 await Context.User.SendMessageAsync($"Setting Log Level to {log}");
             }
             else
-            { await Context.User.SendMessageAsync($"Please enter a value between 0 (Critical Messages) and 5(Debug messages)"); }
+            { await Context.User.SendMessageAsync("Please enter a value between 0 (Critical Messages) and 5(Debug messages)"); }
+        }
+        #endregion
+
+        #region settings
+        [Command("settings"), Summary("Edit guild's config")]
+        public async Task SetParam(string parameter = "", string value = "")
+        {
+            try
+            { await Context.Message.DeleteAsync(); }
+            catch { /*ignored*/ }
+            if(parameter == "")
+            {
+                var str = "No parameter sent. Please enter one of the following parameters :\n";
+                foreach (var method in typeof(GuildConfKeys).GetMethods().Where(m => m.IsStatic))
+                {
+                    if (method.IsStatic)
+                    {
+                        string name = method.Name.Replace("get_", "");
+                        var attr = GuildConfig.GetKeyType(name);
+                        str += $"`{name}{new string(' ', 25 - name.Length)} - {attr.Name}`\n";
+                    }
+                }
+                str += $"\nCurrent settings for **{Context.Guild.Name}** (`{Context.Guild.Id}`) : \n";
+                foreach (var line in GuildConfig.GetGuildSettings(DiVA.Client.GetGuild(Context.Guild.Id)))
+                { str += $"`{line.key}{new string(' ', 25 - line.key.Length)} - {line.value}`\n"; }
+                await Context.User.SendMessageAsync(str);
+            }
+            else
+            {
+                if (GuildConfKeys.Keys.FirstOrDefault(p => p.Item1.Value == parameter).Item1 != null)
+                {
+                    var converter = TypeDescriptor.GetConverter(GuildConfig.GetKeyType(parameter));
+
+                    if (converter.IsValid(value))
+                    {
+                        var guild = DiVA.Client.GetGuild(Context.Guild.Id);
+                        GuildConfig.ChangeGuildSettings(guild, parameter, value);
+                        var str = "Guild settings updated.\n";
+                        foreach (var line in GuildConfig.GetGuildSettings(DiVA.Client.GetGuild(Context.Guild.Id)))
+                        { str += $"`{line.key}{new string(' ', 25 - line.key.Length)} - {line.value}`\n"; }
+                        await Context.User.SendMessageAsync(str);
+                    }
+                    else
+                    { await Context.User.SendMessageAsync("Impossible to update guild settings."); }
+                }
+                else
+                { await Context.User.SendMessageAsync("Invalid parameter key."); }
+            }
         }
         #endregion
 

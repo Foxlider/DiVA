@@ -1,6 +1,7 @@
 ![GitHub release](https://img.shields.io/github/release/Foxlider/DiVA.svg?style=flat-square)
 ![GitHub](https://img.shields.io/github/license/Foxlider/DiVA.svg?style=flat-square)
 ![AppVeyor](https://img.shields.io/appveyor/ci/Foxlider/DiVA.svg?logo=appveyor&style=flat-square)
+[![Build Status](https://dev.azure.com/keelah/DiVA/_apis/build/status/Foxlider.DiVA?branchName=master)](https://dev.azure.com/keelah/DiVA/_build/latest?definitionId=6&branchName=master)
 
 # [ DiVA ]
 DiVA Discord Bot created to replace FoxliBot 
@@ -17,21 +18,40 @@ Click on the link below to make the bot join a server :
 
 
 # [ Commands ]
-  - say			Says something
-  - userinfo		Displays some informations about a user
-  - help			Displays commands
-  - test			Test the player's audio
-  - stream		Plays a livestream
-  - clear			Clear the current queue
-  - stop			Stops the audio player
-  - next			Skips the current song
-  - queue			Displays the player queue
-  - play          plays a youtube video (might work with some other audio sources too)
-  - nowplaying    Displays the current song
-  - version       Displays the version of the bot
-  - choose        Choose between a list of words
-  - roll          Classical dice rolling
-  - status        Changes the status of the bot
+##### Common
+```
+..say           Echos a message.  
+..hello         Says hello  
+..userinfo      Displays information about a user  
+..help          Prints the help of available commands  
+..version       Check the bot's version  
+..choose        If you want a robot to choose for you  
+..roll          Rolls a dice in NdN format  
+..pvroll        Secretly rolls a dice  
+..status        Change the status of the bot  
+```
+
+##### Interactive
+```
+..ping          Ping command
+..poll          Run a poll with reactions.
+```
+
+##### Audio
+```
+..play          Requests a song to be played
+..test          Performs a sound test
+..stream        Streams a livestream URL
+..audiosay      Says something
+..audiolsay     Says something in the given language
+..quit          Quit a channel
+..clear         Clears all songs in queue
+..stop          Stops the playback and disconnect
+..next          Skips current song
+..songlist      Lists current songs
+..nowplaying    Prints current playing song
+```
+
 
 THE END
 
@@ -93,3 +113,35 @@ Fixed :
  - Code cleanup
  - Unknown command too invasive
  - Some tests not working
+
+###   [ v1.8 ]
+###### Added :
+ - TTS Commands : DiVA can now speak in voice channels
+ - Supported voices : en-US / fr-FR
+ - Code cleanup
+
+Fixed :
+ - Fixed Message Delete blocking threads
+ - URLs bringing to the wrong page
+ - Some XML doc being wrong
+
+###   [ v1.9 ]
+Added :
+ - Updated youtube-dl
+
+Fixed :
+ - Crash on empty log
+ - Audio not downloading
+ - Fixed tome text output
+ - Fixed some commands actions
+
+###   [ v2.0 ]
+Added :
+ - Updated youtube-dl
+ - Azure build checks
+
+Fixed :
+ - queue fonciton removing the current song from queue
+ - Exception when using skip if no song is playing
+ - Exception on some logging messages
+ - Handling youtube-dl errors

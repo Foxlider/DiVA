@@ -148,7 +148,5 @@ namespace DiVA.Services
             }
             return result.ToArray();
         }
-
-        
     }
 }
