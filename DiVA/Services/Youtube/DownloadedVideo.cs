@@ -1,8 +1,8 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.IO;
+using Newtonsoft.Json;
 
-namespace DiVA.Services.YouTube
+namespace DiVA.Services.Youtube
 {
     /// <summary>
     /// Represents a downloaded video.
@@ -85,6 +85,6 @@ namespace DiVA.Services.YouTube
         /// After song Handler
         /// </summary>
         public void OnPostPlay()
-        { /*File.Delete(Uri); //Comment this to ceep cached videos */ }
+        { /*File.Delete(Uri); //Comment this to keep cached videos */ }
     }
 }
