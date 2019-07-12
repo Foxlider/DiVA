@@ -62,12 +62,12 @@ steps:
     arguments: '--configuration $(BuildConfiguration)  -r win-x86 --self-contained true /p:useapphost=true --output $(Build.ArtifactStagingDirectory)\Release_x86'
 
 - task: ArchiveFiles@2
-  displayName: 'Archive x64'
+  displayName: 'Archive x86'
   inputs:
-    rootFolderOrFile: '$(Build.ArtifactStagingDirectory)\Release_x64'
+    rootFolderOrFile: '$(Build.ArtifactStagingDirectory)\Release_x86'
     includeRootFolder: true
     archiveType: 'zip'
-    archiveFile: '$(Build.ArtifactStagingDirectory)\Release\DiVA_x64.zip'
+    archiveFile: '$(Build.ArtifactStagingDirectory)\Release\DiVA_x86.zip'
     replaceExistingArchive: true
 
 - task: PublishBuildArtifacts@1
