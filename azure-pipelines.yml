@@ -20,7 +20,7 @@ steps:
   inputs:
     packageType: 'sdk'
     version: '$(DotnetVersion)'
-    installationPath: '$(TEMP)\dotnet'
+    workingDirectory: '$(TEMP)\dotnet'
     includePreviewVersions: true
 
 - task: DotNetCoreCLI@2
