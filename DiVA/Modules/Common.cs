@@ -386,7 +386,7 @@ namespace DiVA.Modules
         [Alias("r")]
         public async Task Roll(string dice)
         {
-            await ReplyAsync(CommandHelper.DiceRoll(dice, Context.User.Mention));
+            await ReplyAsync(CommandHelper.DiceRoll(dice, Context.User.Mention, __rnd));
             try
             { await Context.Message.DeleteAsync(); }
             catch { /* ignored */ }
