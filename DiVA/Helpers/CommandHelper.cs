@@ -43,8 +43,10 @@ namespace DiVA.Helpers
             await Channel.SendMessageAsync(msg);
         }
 
-        public static string DiceRoll(string dice, string mention)
+        public static string DiceRoll(string dice, string mention, Random _rnd)
         {
+            if (_rnd == null) 
+                _rnd = new Random();
             try
             {
                 var result = dice
@@ -62,9 +64,8 @@ namespace DiVA.Helpers
                 string msg   = $"{mention} rolled {result[0]}d{result[1]}";
                 var    range = Enumerable.Range(0, result[0]);
                 int[]  dices = new int[result[0]];
-                Random _rnd  = new Random();
                 foreach (var r in range)
-                { dices[r] = _rnd.Next(1, result[1]); }
+                { dices[r] = _rnd.Next(1, result[1]+1); }
                 msg += "\n [ **";
                 msg += string.Join("** | **", dices);
                 msg += "** ]";
