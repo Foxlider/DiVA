@@ -403,7 +403,7 @@ namespace DiVA.Modules
         [Alias("pvr")]
         public async Task PrivateRoll(string dice)
         {
-            await Context.User.SendMessageAsync(CommandHelper.DiceRoll(dice, Context.User.Mention));
+            await Context.User.SendMessageAsync(CommandHelper.DiceRoll(dice, Context.User.Mention, __rnd));
             try
             { await Context.Message.DeleteAsync(); }
             catch { /* ignored */ }
