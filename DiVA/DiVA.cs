@@ -7,13 +7,16 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using DiVA.Services.Youtube;
+using Microsoft.AppCenter.Analytics;
 
 namespace DiVA
 {
@@ -221,6 +224,11 @@ namespace DiVA
                 await Task.Delay(2000);
                 await msg.DeleteAsync();
             }
+            Analytics.TrackEvent($"[DiVA]  CommandExecute - Command '{commandName}' executed", new Dictionary<string, string> {
+                { "User", context.User.Username},
+                { "Channel", context.Channel.Name },
+                { "Guild", context.Guild.Name }
+            });
             Logger.Log(new LogMessage(LogSeverity.Info, "CMDExecution", $"{commandName} was executed."));
         }
 
