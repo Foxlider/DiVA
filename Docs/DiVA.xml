@@ -4,9 +4,20 @@
         <name>DiVA</name>
     </assembly>
     <members>
+        <member name="T:DiVA.DiVA">
+            <summary>
+            DiVA Main class
+            </summary>
+        </member>
         <member name="M:DiVA.DiVA.RunAsync">
             <summary>
             Main Thread
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:DiVA.DiVA.Disconnect">
+            <summary>
+            Disconnects the bot
             </summary>
             <returns></returns>
         </member>
@@ -251,6 +262,7 @@
             PLAY - Function Play
             </summary>
             <param name="url"></param>
+            <exception cref="T:System.NullReferenceException"></exception>
             <returns></returns>
         </member>
         <member name="M:DiVA.Modules.Audio.SoundTest">

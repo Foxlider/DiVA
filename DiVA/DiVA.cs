@@ -41,7 +41,7 @@ namespace DiVA
             }
         }
 
-        private static async Task RunAsync(string[] args)
+        public static async Task RunAsync(string[] args)
         {
             AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
             var diVa = new DiVA(args);
@@ -102,7 +102,7 @@ namespace DiVA
         /// Main Thread
         /// </summary>
         /// <returns></returns>
-        private async Task RunAsync()
+        public async Task RunAsync()
         {
             string version = $"{Assembly.GetExecutingAssembly().GetName().Name} v{GetVersion()}";
             Logger.Log(Logger.Neutral,
@@ -159,7 +159,15 @@ namespace DiVA
             await Task.Delay(-1);
         }
 
-        
+        /// <summary>
+        /// Disconnects the bot
+        /// </summary>
+        /// <returns></returns>
+        public async Task Disconnect()
+        {
+            await Client.LogoutAsync();
+            await Client.StopAsync();
+        }
 
         /// <summary>
         /// Install commands for the bot
@@ -168,7 +176,7 @@ namespace DiVA
         private async Task InstallCommands()
         {
             // Discover all of the commands in this assembly and load them.
-            await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
+            await _commands.AddModulesAsync(Assembly.GetExecutingAssembly(), _services);
             // Hook the MessageReceived Event into our Command Handler
             _commands.CommandExecuted += OnCommandExecuteAsync;
             Client.MessageReceived += HandleCommand;

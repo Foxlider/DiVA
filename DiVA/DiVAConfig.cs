@@ -146,7 +146,7 @@ namespace DiVA
     /// </summary>
     public class GuildConfKeys
     {
-        protected static readonly List<(GuildConfKeys, Type)> Keys = new List<(GuildConfKeys, Type)>
+        protected internal static readonly List<(GuildConfKeys, Type)> Keys = new List<(GuildConfKeys, Type)>
         {
             (UserJoinedAllowed, typeof(bool)),
             (UserJoinedDefaultChannel, typeof(ulong)),
