@@ -112,7 +112,7 @@ namespace DiVA.Services
                 { break; }
                 if (stream != null) await stream.WriteAsync(buffer, 0, byteCount);
             }
-            await stream.FlushAsync();
+            if (stream != null) await stream.FlushAsync();
         }
 
         /// <summary>

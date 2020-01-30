@@ -7,22 +7,28 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using DiVA.Services.Youtube;
+using Microsoft.AppCenter.Analytics;
 
 namespace DiVA
 {
+    /// <summary>
+    /// DiVA Main class
+    /// </summary>
     public class DiVA
     {
         private CommandService _commands;
-        public static DiscordSocketClient Client;
+        internal static DiscordSocketClient Client { get; set; }
         private readonly IServiceProvider _services;
-        public static IConfigurationRoot Configuration;
+        public static IConfigurationRoot Configuration { get; set; }
         internal static int LogLvl = 3;
 
         static void Main(string[] args)
@@ -38,7 +44,7 @@ namespace DiVA
             }
         }
 
-        private static async Task RunAsync(string[] args)
+        public static async Task RunAsync(string[] args)
         {
             AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
             var diVa = new DiVA(args);
@@ -99,7 +105,7 @@ namespace DiVA
         /// Main Thread
         /// </summary>
         /// <returns></returns>
-        private async Task RunAsync()
+        public async Task RunAsync()
         {
             string version = $"{Assembly.GetExecutingAssembly().GetName().Name} v{GetVersion()}";
             Logger.Log(Logger.Neutral,
@@ -117,8 +123,8 @@ namespace DiVA
             //services = new ServiceCollection().BuildServiceProvider();             // Create a new instance of a service collection
 
             await InstallCommands();
-            if (Configuration["tokens:discord"] == null || Configuration["tokens:discord"] == "" ||
-                Configuration["tokens:youtube"] == null || Configuration["tokens:youtube"] == "")
+            if (string.IsNullOrEmpty(Configuration["tokens:discord"]) ||
+                string.IsNullOrEmpty(Configuration["tokens:youtube"]))
             {
                 Logger.Log(Logger.Error, "Impossible to read Configuration.", "DiVA Login");
                 Logger.Log(Logger.Neutral, "Do you want to edit the configuration file ? (Y/n)\n", "DiVA Login");
@@ -156,7 +162,15 @@ namespace DiVA
             await Task.Delay(-1);
         }
 
-        
+        /// <summary>
+        /// Disconnects the bot
+        /// </summary>
+        /// <returns></returns>
+        public async Task Disconnect()
+        {
+            await Client.LogoutAsync();
+            await Client.StopAsync();
+        }
 
         /// <summary>
         /// Install commands for the bot
@@ -165,7 +179,7 @@ namespace DiVA
         private async Task InstallCommands()
         {
             // Discover all of the commands in this assembly and load them.
-            await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
+            await _commands.AddModulesAsync(Assembly.GetExecutingAssembly(), _services);
             // Hook the MessageReceived Event into our Command Handler
             _commands.CommandExecuted += OnCommandExecuteAsync;
             Client.MessageReceived += HandleCommand;
@@ -210,6 +224,11 @@ namespace DiVA
                 await Task.Delay(2000);
                 await msg.DeleteAsync();
             }
+            Analytics.TrackEvent($"[DiVA]  CommandExecute - Command '{commandName}' executed", new Dictionary<string, string> {
+                { "User", context.User.Username},
+                { "Channel", context.Channel.Name },
+                { "Guild", context.Guild.Name }
+            });
             Logger.Log(new LogMessage(LogSeverity.Info, "CMDExecution", $"{commandName} was executed."));
         }
 
@@ -248,13 +267,10 @@ namespace DiVA
         {
             Random rnd = new Random();
             var appSettings = ConfigurationManager.AppSettings;
-            if (appSettings[$"{param.Guild.Id}.UserJoinedAllowed"] == "true")
+            if (appSettings[$"{param.Guild.Id}.UserJoinedAllowed"] == "true" && UInt64.TryParse(appSettings[$"{param.Guild.Id}.UserJoinedDefaultChannel"], out ulong chanID))
             {
-                if (UInt64.TryParse(appSettings[$"{param.Guild.Id}.UserJoinedDefaultChannel"], out ulong chanID))
-                {
-                    var channel = Client.GetChannel(chanID) as SocketTextChannel;
-                    await CommandHelper.SayHelloAsync(channel, Client, param, rnd);
-                }
+                var channel = Client.GetChannel(chanID) as SocketTextChannel;
+                await CommandHelper.SayHelloAsync(channel, Client, param, rnd);
             }
         }
 
@@ -266,14 +282,10 @@ namespace DiVA
         private static async Task UserLeftGuildHandler(SocketGuildUser param)
         {
             var appSettings = ConfigurationManager.AppSettings;
-            if (appSettings[$"{param.Guild.Id}.UserJoinedAllowed"] == "true")
-            {
-                if (UInt64.TryParse(appSettings[$"{param.Guild.Id}.UserJoinedDefaultChannel"], out ulong chanID))
-                {
-                    if (Client.GetChannel(chanID) is SocketTextChannel channel)
-                        await channel.SendMessageAsync($"{param.Nickname} ({param.Username}) left us... Say bye ! ");
-                }
-            }
+            if (appSettings[$"{param.Guild.Id}.UserJoinedAllowed"] == "true" 
+             && UInt64.TryParse(appSettings[$"{param.Guild.Id}.UserJoinedDefaultChannel"], out ulong chanID) 
+             && Client.GetChannel(chanID) is SocketTextChannel channel)
+            { await channel.SendMessageAsync($"{param.Nickname} ({param.Username}) left us... Say bye ! "); }
         }
 
         /// <summary>

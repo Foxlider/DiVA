@@ -55,40 +55,7 @@ namespace DiVATests
             else { Assert.Pass("Could not find Config file. Setting to passed"); }
         }
 
-        //TO DO Fix this
-        //[Test]
-        //public void TestAudioQueue()
-        //{
-        //    IGuild guild = CreateMockGuild().Object;
-
-        //    AudioService service = new AudioService();
-        //    VoiceConnexion connexion = new VoiceConnexion
-        //    { Queue = new List<IPlayable>() };
-
-        //    service.ConnectedChannels.TryAdd(guild.Id, connexion);
-        //    service.ConnectedChannels.TryGetValue(guild.Id, out VoiceConnexion voice);
-        //    DownloadedVideo video = new DownloadedVideo("TITLE", 5, "http://url.com", "YoutubeID", "YoutubeID.mp3");
-        //    voice.Queue.Add(video);
-
-        //    Assert.AreEqual(voice.Queue.FirstOrDefault()?.DurationString, video.DurationString);
-        //    Assert.AreEqual(voice.Queue.FirstOrDefault()?.Title, video.Title);
-        //    Assert.AreEqual(voice.Queue.FirstOrDefault()?.Uri, video.Uri);
-        //    Assert.AreEqual(voice.Queue.FirstOrDefault()?.Url, video.Url);
-
-
-        //    var songlist = service.SongList(guild);
-        //    Assert.AreEqual(songlist.FirstOrDefault()?.DurationString, video.DurationString);
-        //    Assert.AreEqual(songlist.FirstOrDefault()?.Title, video.Title);
-        //    Assert.AreEqual(songlist.FirstOrDefault()?.Uri, video.Uri);
-        //    Assert.AreEqual(songlist.FirstOrDefault()?.Url, video.Url);
-        //    Console.WriteLine(service);
-        //    Console.WriteLine(guild);
-        //    Console.WriteLine(service.Clear(guild).Count);
-        //    Assert.AreEqual(service.Clear(guild).Count, 0);
-        //}
-
-
-#region mocks
+        #region mocks
 
         private Mock<ICommandContext> CreateMockContext(string command)
         {

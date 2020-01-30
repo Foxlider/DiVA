@@ -28,7 +28,7 @@ namespace DiVA.Modules
         private readonly CommandService _service;
         private readonly IConfigurationRoot _config;
         private readonly DiscordSocketClient _client;
-        Random __rnd = new Random();
+        readonly Random __rnd = new Random();
 
         /// <summary>
         /// Override ReplyAsync
@@ -238,11 +238,11 @@ namespace DiVA.Modules
                     foreach (var cmd in module.Commands)
                     {
                         var result = await cmd.CheckPreconditionsAsync(Context);
-                        if (result.IsSuccess)
-                        {
-                            string alias = cmd.Aliases.First();
-                            description += $"{prefix}{alias.PadRight(10)}\t{cmd.Summary}\n";
-                        }
+
+                        if (!result.IsSuccess) continue;
+
+                        string alias = cmd.Aliases.First();
+                        description += $"{prefix}{alias.PadRight(10)}\t{cmd.Summary}\n";
                     }
                     description += "```";
 
@@ -569,6 +569,7 @@ namespace DiVA.Modules
         /// PLAY - Function Play
         /// </summary>
         /// <param name="url"></param>
+        /// <exception cref="NullReferenceException"></exception>
         /// <returns></returns>
         [Alias("play", "request", "songrequest")]
         [Command("sq", RunMode = RunMode.Async)]
@@ -810,7 +811,7 @@ namespace DiVA.Modules
                     Logger.Log(Logger.Warning, "Error getting Voice Channel!", "Audio Stream");
                     await ReplyAsync("I can't get your Voice Channel.");
                 }
-                await SongService.Quit(voiceChannel.Guild);
+                if (voiceChannel != null) await SongService.Quit(voiceChannel.Guild);
             }
             else
             {
@@ -1046,13 +1047,12 @@ namespace DiVA.Modules
                     var hasDeleted = false;
                     foreach (FileInfo file in d.GetFiles())
                     {
-                        if (file.Name == input)
-                        {
-                            file.Delete();
-                            await Context.User.SendMessageAsync($"File {input}.mp3 deleted.");
-                            hasDeleted = true;
-                            break;
-                        }
+                        if (file.Name != input) continue;
+
+                        file.Delete();
+                        await Context.User.SendMessageAsync($"File {input}.mp3 deleted.");
+                        hasDeleted = true;
+                        break;
                     }
                     if (!hasDeleted)
                     { await Context.User.SendMessageAsync($"No file have been found under the name {input}"); }
@@ -1097,12 +1097,11 @@ namespace DiVA.Modules
                 var str = "No parameter sent. Please enter one of the following parameters :\n";
                 foreach (var method in typeof(GuildConfKeys).GetMethods().Where(m => m.IsStatic))
                 {
-                    if (method.IsStatic)
-                    {
-                        string name = method.Name.Replace("get_", "");
-                        var attr = GuildConfig.GetKeyType(name);
-                        str += $"`{name}{new string(' ', 25 - name.Length)} - {attr.Name}`\n";
-                    }
+                    if (!method.IsStatic) continue;
+
+                    string name = method.Name.Replace("get_", "");
+                    var    attr = GuildConfig.GetKeyType(name);
+                    str += $"`{name}{new string(' ', 25 - name.Length)} - {attr.Name}`\n";
                 }
                 str += $"\nCurrent settings for **{Context.Guild.Name}** (`{Context.Guild.Id}`) : \n";
                 foreach (var line in GuildConfig.GetGuildSettings(DiVA.Client.GetGuild(Context.Guild.Id)))
