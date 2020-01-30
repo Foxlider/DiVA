@@ -17,12 +17,15 @@ using DiVA.Services.Youtube;
 
 namespace DiVA
 {
+    /// <summary>
+    /// DiVA Main class
+    /// </summary>
     public class DiVA
     {
         private CommandService _commands;
-        public static DiscordSocketClient Client;
+        internal static DiscordSocketClient Client { get; set; }
         private readonly IServiceProvider _services;
-        public static IConfigurationRoot Configuration;
+        public static IConfigurationRoot Configuration { get; set; }
         internal static int LogLvl = 3;
 
         static void Main(string[] args)
@@ -117,8 +120,8 @@ namespace DiVA
             //services = new ServiceCollection().BuildServiceProvider();             // Create a new instance of a service collection
 
             await InstallCommands();
-            if (Configuration["tokens:discord"] == null || Configuration["tokens:discord"] == "" ||
-                Configuration["tokens:youtube"] == null || Configuration["tokens:youtube"] == "")
+            if (string.IsNullOrEmpty(Configuration["tokens:discord"]) ||
+                string.IsNullOrEmpty(Configuration["tokens:youtube"]))
             {
                 Logger.Log(Logger.Error, "Impossible to read Configuration.", "DiVA Login");
                 Logger.Log(Logger.Neutral, "Do you want to edit the configuration file ? (Y/n)\n", "DiVA Login");
@@ -248,13 +251,10 @@ namespace DiVA
         {
             Random rnd = new Random();
             var appSettings = ConfigurationManager.AppSettings;
-            if (appSettings[$"{param.Guild.Id}.UserJoinedAllowed"] == "true")
+            if (appSettings[$"{param.Guild.Id}.UserJoinedAllowed"] == "true" && UInt64.TryParse(appSettings[$"{param.Guild.Id}.UserJoinedDefaultChannel"], out ulong chanID))
             {
-                if (UInt64.TryParse(appSettings[$"{param.Guild.Id}.UserJoinedDefaultChannel"], out ulong chanID))
-                {
-                    var channel = Client.GetChannel(chanID) as SocketTextChannel;
-                    await CommandHelper.SayHelloAsync(channel, Client, param, rnd);
-                }
+                var channel = Client.GetChannel(chanID) as SocketTextChannel;
+                await CommandHelper.SayHelloAsync(channel, Client, param, rnd);
             }
         }
 
@@ -266,14 +266,10 @@ namespace DiVA
         private static async Task UserLeftGuildHandler(SocketGuildUser param)
         {
             var appSettings = ConfigurationManager.AppSettings;
-            if (appSettings[$"{param.Guild.Id}.UserJoinedAllowed"] == "true")
-            {
-                if (UInt64.TryParse(appSettings[$"{param.Guild.Id}.UserJoinedDefaultChannel"], out ulong chanID))
-                {
-                    if (Client.GetChannel(chanID) is SocketTextChannel channel)
-                        await channel.SendMessageAsync($"{param.Nickname} ({param.Username}) left us... Say bye ! ");
-                }
-            }
+            if (appSettings[$"{param.Guild.Id}.UserJoinedAllowed"] == "true" 
+             && UInt64.TryParse(appSettings[$"{param.Guild.Id}.UserJoinedDefaultChannel"], out ulong chanID) 
+             && Client.GetChannel(chanID) is SocketTextChannel channel)
+            { await channel.SendMessageAsync($"{param.Nickname} ({param.Username}) left us... Say bye ! "); }
         }
 
         /// <summary>

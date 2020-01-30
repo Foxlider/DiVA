@@ -6,7 +6,7 @@
     <StartupObject>DiVA.DiVA</StartupObject>
     <ApplicationIcon />
     <Win32Resource />
-    <Version>2.0.2</Version>
+    <Version>2.0.3</Version>
     <Authors>Keelah</Authors>
     <Company>FoxliCorp</Company>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
@@ -23,18 +23,22 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <CodeAnalysisRuleSet>DiVA.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugTTS|AnyCPU'">
     <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <CodeAnalysisRuleSet>DiVA.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugVerbose|AnyCPU'">
     <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <CodeAnalysisRuleSet>DiVA.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DocumentationFile>..\Docs\DiVA.xml</DocumentationFile>
+    <CodeAnalysisRuleSet>DiVA.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
 
   <ItemGroup>
