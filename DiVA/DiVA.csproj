@@ -3,6 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.0</TargetFramework>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <StartupObject>DiVA.DiVA</StartupObject>
     <ApplicationIcon />
     <Win32Resource />

@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <UserSecretsId>dotnet-DivaService-4C303586-22C5-40D6-B978-E9C6E0C99264</UserSecretsId>
     <Authors>Keelah</Authors>
     <Company>FoxliCorp</Company>
