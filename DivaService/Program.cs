@@ -4,6 +4,7 @@ using System;
 using Microsoft.AppCenter;
 using Microsoft.AppCenter.Analytics;
 using Microsoft.AppCenter.Crashes;
+using Microsoft.Extensions.Logging;
 
 namespace DivaService
 {
@@ -24,6 +25,12 @@ namespace DivaService
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
+                .ConfigureLogging(logging =>
+                {
+                    logging.ClearProviders();
+                    logging.AddConsole();
+                    logging.AddEventLog();
+                })
                 .UseWindowsService()
                 .ConfigureServices((hostContext, services) =>
                 {

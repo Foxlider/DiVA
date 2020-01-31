@@ -156,7 +156,9 @@ namespace DiVA
                 }
                 Logger.Log(Logger.Neutral, "  └─", "DiVA Login");
 
-                Console.Title = $"{Assembly.GetExecutingAssembly().GetName().Name} v{GetVersion()}";
+                try{ Console.Title = $"{Assembly.GetExecutingAssembly().GetName().Name} v{GetVersion()}"; }
+                catch (IOException) { /**/ }
+
                 await SetDefaultStatus(Client);
             };
             await Task.Delay(-1);
@@ -168,8 +170,11 @@ namespace DiVA
         /// <returns></returns>
         public async Task Disconnect()
         {
-            await Client.LogoutAsync();
-            await Client.StopAsync();
+            if (Client != null)
+            {
+                await Client.LogoutAsync();
+                await Client.StopAsync();
+            }
         }
 
         /// <summary>
@@ -227,7 +232,7 @@ namespace DiVA
             Analytics.TrackEvent($"[DiVA]  CommandExecute - Command '{commandName}' executed", new Dictionary<string, string> {
                 { "User", context.User.Username},
                 { "Channel", context.Channel.Name },
-                { "Guild", context.Guild.Name }
+                { "Guild", context.Guild?.Name }
             });
             Logger.Log(new LogMessage(LogSeverity.Info, "CMDExecution", $"{commandName} was executed."));
         }

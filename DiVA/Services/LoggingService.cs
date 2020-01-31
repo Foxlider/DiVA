@@ -67,13 +67,15 @@ namespace DiVA.Services
             if (source == null)
             { source = ""; }
             LogToFile(severity, message, source);
-            LogToConsole(severity, message, source);
+            try{ LogToConsole(severity, message, source); }
+            catch { /* */ }
         }
 
         public static void Log(LogMessage logMessage)
         {
             LogToFile((int)logMessage.Severity, logMessage.Message, logMessage.Source    ?? "");
-            LogToConsole((int)logMessage.Severity, logMessage.Message, logMessage.Source ?? "");
+            try{ LogToConsole((int)logMessage.Severity, logMessage.Message, logMessage.Source ?? ""); }
+            catch { /* */ }
         }
 
         private static void LogToFile(int severity, string message, string source)
@@ -118,7 +120,10 @@ namespace DiVA.Services
 
         private static IEnumerable<string> FormatFullText(string message, string prefix)
         {
-            var bufferLen = Console.BufferWidth;
+            int bufferLen;
+            try { bufferLen = Console.BufferWidth; }
+            catch (IOException) { bufferLen = 120; }
+            
             var prefixLen = prefix.Length;
             var lines     = message?.Split("\n");
             var result    = new List<string>();
